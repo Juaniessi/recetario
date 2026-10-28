@@ -30,6 +30,8 @@
   sub:
     - id: panes
       nombre: Panes
+    - id: tortillas
+      nombre: Tortillas
 
 - id: desayuno-y-merienda
   color: naranja
