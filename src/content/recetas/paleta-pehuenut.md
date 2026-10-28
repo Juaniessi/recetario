@@ -4,7 +4,7 @@ estado: final
 categorias:
   - helados/paletas
 sabor: dulce
-equipo: [freezer]
+equipo: [cacerola, freezer]
 ingrediente_principal: [avellana]
 fuente:
   autor: Propia

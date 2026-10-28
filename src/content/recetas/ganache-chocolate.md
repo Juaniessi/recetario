@@ -5,7 +5,7 @@ categorias:
   - postres-y-pasteleria/chocolate
   - basicos
 sabor: dulce
-equipo: [sin-horno]
+equipo: [cacerola, sin-horno]
 ingrediente_principal: [chocolate]
 fuente:
   autor: Propia

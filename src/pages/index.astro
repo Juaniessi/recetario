@@ -16,13 +16,16 @@ const ramas = arbol.map((r) => ({ ...r, sub: r.sub.filter((s) => usadas.has(s.id
 const principales = ramas.filter((r) => r.principal);
 const otras = ramas.filter((r) => !r.principal);
 
-const ingredientes = [...new Set(recetas.flatMap((r) => r.data.ingrediente_principal))].sort((a, b) => a.localeCompare(b, 'es'));
-
 const transversales = [
   { grupo: 'sabor', titulo: 'Dulce o salado', valores: Object.entries(ETIQUETAS.sabor) },
   { grupo: 'equipo', titulo: 'Equipo', valores: Object.entries(ETIQUETAS.equipo) },
-  { grupo: 'ing', titulo: 'Ingrediente principal', valores: ingredientes.map((i) => [i, etiquetaIngrediente(i)]) },
 ];
+
+// Los nombres de los ingredientes, para «Ingrediente» y para mostrar cuáles coinciden.
+// Primero los ingredientes de verdad; al final, las etiquetas de ingrediente_principal,
+// que sirven para encontrar una receta sin ingredientes cargados (las pendientes).
+const realesDe = (r) => [...new Set(r.data.ingredientes.flatMap((g) => g.lista.map((i) => i.nombre)))];
+const nombresDe = (r) => [...realesDe(r), ...r.data.ingrediente_principal.map(etiquetaIngrediente)];
 
 // Lo que el buscador mira: título, ingredientes y etiquetas.
 const textoDe = (r) =>
@@ -93,6 +96,11 @@ const textoDe = (r) =>
         </div>
       </div>
     ))}
+
+    <div>
+      <label class="grupo-titulo" for="buscar-ing">Ingrediente</label>
+      <input class="buscar ing" id="buscar-ing" type="search" placeholder="Escribí uno o varios: chocolate, coco…" autocomplete="off" />
+    </div>
   </div>
 
   <div class="resumen">
@@ -113,13 +121,15 @@ const textoDe = (r) =>
         data-cats={r.data.categorias.join(' ')}
         data-sabor={r.data.sabor}
         data-equipo={r.data.equipo.join(' ')}
-        data-ing={r.data.ingrediente_principal.join(' ')}
+        data-ingredientes={nombresDe(r).join('|')}
+        data-reales={realesDe(r).length}
         data-texto={textoDe(r)}
       >
         <a href={`${base}${r.id}/`}>
           <span class="t">{r.data.titulo}</span>
           {r.data.estado !== 'final' && <span class="estado">{ETIQUETAS.estado[r.data.estado]}</span>}
           <span class="r" style="display:block">{r.data.categorias.map((c) => nombreDeRama(c, arbol)).join(' · ')}</span>
+          <span class="lleva" hidden></span>
         </a>
       </li>
     ))}
@@ -127,24 +137,41 @@ const textoDe = (r) =>
 </Base>
 
 <script>
-  import { vacia, filtrar, contarRama, contarValor, alternar, leerSeleccion, escribirSeleccion, enRama } from '../lib/filtros.js';
+  import { vacia, filtrar, contarRama, contarValor, alternar, leerSeleccion, escribirSeleccion, enRama, normalizar, ingredientesQueCoinciden } from '../lib/filtros.js';
 
   const tarjetas = [...document.querySelectorAll('.tarjeta')];
-  const recetas = tarjetas.map((el) => ({
-    el,
-    cats: el.dataset.cats.split(' '),
-    sabor: [el.dataset.sabor],
-    equipo: el.dataset.equipo.split(' '),
-    ing: el.dataset.ing.split(' '),
-    texto: el.dataset.texto,
-  }));
+  const recetas = tarjetas.map((el) => {
+    const nombres = el.dataset.ingredientes.split('|');
+    return {
+      el,
+      nombres,
+      cats: el.dataset.cats.split(' '),
+      sabor: [el.dataset.sabor],
+      equipo: el.dataset.equipo.split(' '),
+      ingredientes: nombres.map(normalizar),
+      texto: el.dataset.texto,
+    };
+  });
   const buscar = document.getElementById('buscar');
+  const buscarIng = document.getElementById('buscar-ing');
   let sel = { ...vacia(), ...leerSeleccion(location.search) };
   buscar.value = sel.q;
+  buscarIng.value = sel.ing;
 
   function pintar() {
     const quedan = new Set(filtrar(recetas, sel));
-    for (const r of recetas) r.el.hidden = !quedan.has(r);
+    for (const r of recetas) {
+      r.el.hidden = !quedan.has(r);
+      // Con un ingrediente escrito, la tarjeta dice cuáles de los suyos coincidieron.
+      const lleva = r.el.querySelector('.lleva');
+      const indices = sel.ing && quedan.has(r) ? ingredientesQueCoinciden(r, sel.ing) : null;
+      lleva.hidden = !indices;
+      if (indices) {
+        // Se muestran los ingredientes de verdad; la etiqueta, solo si no hay otro.
+        const reales = indices.filter((i) => i < Number(r.el.dataset.reales));
+        lleva.textContent = `Lleva: ${(reales.length ? reales : indices).map((i) => r.nombres[i]).join(' · ')}`;
+      }
+    }
 
     const padre = sel.cat.split('/')[0];
     for (const b of document.querySelectorAll('[data-cat]')) {
@@ -192,11 +219,16 @@ const textoDe = (r) =>
     } else if (b.id === 'todas') {
       sel = vacia();
       buscar.value = '';
+      buscarIng.value = '';
     } else return;
     pintar();
   });
   buscar.addEventListener('input', () => {
     sel.q = buscar.value.trim();
+    pintar();
+  });
+  buscarIng.addEventListener('input', () => {
+    sel.ing = buscarIng.value.trim();
     pintar();
   });
   pintar();

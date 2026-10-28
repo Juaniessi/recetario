@@ -4,7 +4,7 @@ estado: en-prueba            # final | en-prueba | pendiente
 categorias:                  # una o varias, de src/data/categorias.yml
   - postres-y-pasteleria/tortas-budines-y-brownies
 sabor: dulce                 # dulce | salado
-equipo: [horno]              # horno | waflera | freezer | sin-horno (una o varias)
+equipo: [horno]              # horno | waflera | cacerola | sarten | freezer | sin-horno (una o varias)
 ingrediente_principal: [chocolate]   # minúsculas, guiones en vez de espacios
 fuente:                      # opcional; sacalo entero si la receta es propia
   autor: Quién la hizo

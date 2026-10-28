@@ -64,6 +64,7 @@ sitio solas cuando alguna receta las usa. Las ramas con `principal: true`
 (verde, amarillo, naranja, violeta, indigo o celeste), que pinta sus botones,
 sus tarjetas y la cabecera de sus recetas.
 
-Los botones de **Dulce / Salado**, **Equipo** e **Ingrediente principal** salen
-de cada receta (`sabor`, `equipo`, `ingrediente_principal`). Un ingrediente
-principal nuevo aparece solo como botón.
+Los botones de **Dulce / Salado** y **Equipo** salen de cada receta (`sabor`,
+`equipo`). **Ingrediente** no son botones: se escribe, y busca en los nombres de
+los ingredientes de cada receta (más `ingrediente_principal`, que sirve para
+encontrar las recetas pendientes que todavía no tienen ingredientes cargados).

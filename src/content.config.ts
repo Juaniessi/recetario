@@ -63,7 +63,7 @@ const recetas = defineCollection({
       )
       .min(1),
     sabor: z.enum(['dulce', 'salado']),
-    equipo: z.array(z.enum(['horno', 'waflera', 'freezer', 'sin-horno'])).min(1),
+    equipo: z.array(z.enum(['horno', 'waflera', 'freezer', 'cacerola', 'sarten', 'sin-horno'])).min(1),
     ingrediente_principal: z.array(slug).min(1),
     fuente: z
       .object({

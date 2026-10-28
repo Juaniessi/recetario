@@ -165,3 +165,5 @@ button, input, select { font: inherit; color: inherit; }
 .cuerpo .cant.fija::after { content: none; }
 .cuerpo ol > li { margin: 10px 0; }
 .cuerpo h2 { border-bottom: 2px solid var(--borde); padding-bottom: 4px; }
+.buscar.ing { margin: 0; }
+.tarjeta .lleva { display: block; margin-top: 4px; font-size: 0.88rem; color: var(--c-texto); background: var(--c-bg); border-radius: 6px; padding: 2px 8px; width: fit-content; max-width: 100%; }

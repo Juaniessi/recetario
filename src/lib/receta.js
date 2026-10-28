@@ -47,7 +47,7 @@ export function reemplazarCantidades(html, receta, archivo) {
 export const ETIQUETAS = {
   estado: { final: 'Final', 'en-prueba': 'En prueba', pendiente: 'Pendiente' },
   sabor: { dulce: 'Dulce', salado: 'Salado' },
-  equipo: { horno: 'Horno', waflera: 'Waflera', freezer: 'Freezer', 'sin-horno': 'Sin horno' },
+  equipo: { horno: 'Horno', waflera: 'Waflera', cacerola: 'Cacerola', sarten: 'Sartén', freezer: 'Freezer', 'sin-horno': 'Sin horno' },
 };
 
 // "pistacho" -> "Pistacho" · "dulce-de-leche" -> "Dulce de leche"

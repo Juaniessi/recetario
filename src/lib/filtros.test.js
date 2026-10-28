@@ -1,21 +1,21 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { vacia, filtrar, contarRama, contarValor, leerSeleccion, escribirSeleccion, normalizar } from './filtros.js';
+import { vacia, filtrar, contarRama, contarValor, leerSeleccion, escribirSeleccion, normalizar, ingredientesQueCoinciden } from './filtros.js';
 
-const r = (nombre, cats, sabor, equipo, ing) => ({ nombre, cats, sabor: [sabor], equipo, ing, texto: normalizar(nombre) });
+const r = (nombre, cats, sabor, equipo, ingredientes) => ({ nombre, cats, sabor: [sabor], equipo, ingredientes: ingredientes.map(normalizar), texto: normalizar(nombre) });
 
-// Las 10 recetas de la carga inicial, como quedaron en la tabla del plan.
+// Las 10 recetas, con algunos de sus ingredientes.
 const RECETAS = [
-  r('Brownie', ['postres-y-pasteleria/tortas-budines-y-brownies'], 'dulce', ['horno'], ['chocolate']),
-  r('Waffles dulces', ['desayuno-y-merienda/waffles'], 'dulce', ['waflera'], ['harina']),
-  r('Waffles salados', ['desayuno-y-merienda/waffles'], 'salado', ['waflera'], ['harina']),
-  r('Ciabatta', ['panes-y-masas/panes'], 'salado', ['horno'], ['harina']),
-  r('Miga regular', ['panes-y-masas/panes'], 'salado', ['horno'], ['harina']),
-  r('Pehuenut', ['helados/paletas'], 'dulce', ['freezer'], ['avellana']),
-  r('Pehuenia', ['helados/paletas'], 'dulce', ['freezer'], ['pistacho', 'chocolate']),
-  r('Coco, yogur y limón', ['helados/paletas'], 'dulce', ['freezer'], ['coco', 'yogur']),
-  r('Cobertura', ['postres-y-pasteleria/chocolate', 'basicos'], 'dulce', ['sin-horno'], ['chocolate']),
-  r('Ganache', ['postres-y-pasteleria/chocolate', 'basicos'], 'dulce', ['sin-horno'], ['chocolate']),
+  r('Brownie', ['postres-y-pasteleria/tortas-budines-y-brownies'], 'dulce', ['horno'], ['Manteca sin sal', 'Chocolate Tronador 71 %', 'Huevos', 'Harina 0000 común']),
+  r('Waffles dulces', ['desayuno-y-merienda/waffles'], 'dulce', ['waflera'], ['Harina leudante', 'Harina integral', 'Huevo', 'Ralladura de mandarina']),
+  r('Waffles salados', ['desayuno-y-merienda/waffles'], 'salado', ['waflera'], ['Harina leudante', 'Huevo', 'Ajo en polvo']),
+  r('Ciabatta', ['panes-y-masas/panes'], 'salado', ['horno'], ['Harina panadera', 'Miel']),
+  r('Miga regular', ['panes-y-masas/panes'], 'salado', ['horno'], ['Harina panadera']),
+  r('Pehuenut', ['helados/paletas'], 'dulce', ['freezer', 'cacerola'], ['Untable Pehuenut', 'Leche deslactosada']),
+  r('Pehuenia', ['helados/paletas'], 'dulce', ['freezer'], []),
+  r('Coco, yogur y limón', ['helados/paletas'], 'dulce', ['freezer'], ['Coco rallado', 'Yogur griego', 'Chocolate blanco', 'Jugo de limón']),
+  r('Cobertura', ['postres-y-pasteleria/chocolate', 'basicos'], 'dulce', ['sin-horno'], ['Chocolate cobertura Tronador 54 %', 'Aceite neutro']),
+  r('Ganache', ['postres-y-pasteleria/chocolate', 'basicos'], 'dulce', ['sin-horno', 'cacerola'], ['Chocolate cobertura', 'Crema de leche', 'Manteca']),
 ];
 
 const nombres = (sel) => filtrar(RECETAS, { ...vacia(), ...sel }).map((x) => x.nombre);
@@ -68,4 +68,29 @@ test('la selección va y vuelve de la dirección', () => {
   assert.equal(s, '?cat=helados/paletas&sabor=dulce&equipo=horno,waflera');
   assert.deepEqual(leerSeleccion(s), sel);
   assert.equal(escribirSeleccion(vacia()), '');
+});
+
+test('ingrediente escrito: chocolate trae las que lo llevan', () => {
+  assert.deepEqual(nombres({ ing: 'chocolate' }), ['Brownie', 'Coco, yogur y limón', 'Cobertura', 'Ganache']);
+});
+
+test('ingrediente escrito: cada palabra en algún ingrediente', () => {
+  assert.deepEqual(nombres({ ing: 'coco limon' }), ['Coco, yogur y limón']);
+  assert.deepEqual(nombres({ ing: 'harina huevo' }), ['Brownie', 'Waffles dulces', 'Waffles salados']);
+  assert.deepEqual(nombres({ ing: 'trufa' }), []);
+});
+
+test('ingrediente escrito: dice cuáles coincidieron', () => {
+  assert.deepEqual(ingredientesQueCoinciden(RECETAS[1], 'HARINA'), [0, 1]);
+  assert.equal(ingredientesQueCoinciden(RECETAS[1], 'harina chocolate'), null);
+});
+
+test('cacerola trae Pehuenut y ganache', () => {
+  assert.deepEqual(nombres({ equipo: ['cacerola'] }), ['Pehuenut', 'Ganache']);
+});
+
+test('el ingrediente escrito también va a la dirección', () => {
+  const sel = { ...vacia(), ing: 'dulce de leche' };
+  assert.equal(escribirSeleccion(sel), '?ing=dulce+de+leche');
+  assert.deepEqual(leerSeleccion(escribirSeleccion(sel)), sel);
 });
