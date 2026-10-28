@@ -58,7 +58,9 @@ manda un mail. El error dice qué archivo y qué campo. Los más comunes:
 El árbol vive en `src/data/categorias.yml`. Una receta puede estar en varias
 ramas (la ganache está en «Postres y pastelería › Chocolate» y en «Básicos»).
 Para sumar una rama o una sub-rama, se agrega ahí. Las sub-ramas aparecen en el
-sitio solas cuando alguna receta las usa. Cada rama grande lleva un `color`
+sitio solas cuando alguna receta las usa. Las ramas con `principal: true`
+(hoy Comidas principales y Postres y pastelería) van arriba, grandes, junto a
+«Todas las recetas»; el resto queda abajo, en «Filtrar por». Cada rama grande lleva un `color`
 (verde, amarillo, naranja, violeta, indigo o celeste), que pinta sus botones,
 sus tarjetas y la cabecera de sus recetas.
 
