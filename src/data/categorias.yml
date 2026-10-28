@@ -1,0 +1,50 @@
+# Árbol de categorías del recetario, por tipo de comida.
+#
+# - Las ramas grandes se ven siempre en el inicio, aunque no tengan recetas.
+# - Las sub-ramas aparecen solas cuando alguna receta las usa.
+# - Una receta las nombra por su id: "helados" o "helados/paletas".
+#   Puede nombrar varias.
+# - Para sumar una rama o una sub-rama, se agrega acá y listo.
+
+- id: comidas-principales
+  nombre: Comidas principales
+  aclaracion: almuerzo y cena
+  sub:
+    - id: carnes
+      nombre: Carnes
+    - id: guisos-y-ollas
+      nombre: Guisos y ollas
+    - id: pastas
+      nombre: Pastas
+    - id: verduras
+      nombre: Verduras
+
+- id: panes-y-masas
+  nombre: Panes y masas
+  sub:
+    - id: panes
+      nombre: Panes
+
+- id: desayuno-y-merienda
+  nombre: Desayuno y merienda
+  sub:
+    - id: waffles
+      nombre: Waffles
+
+- id: postres-y-pasteleria
+  nombre: Postres y pastelería
+  sub:
+    - id: tortas-budines-y-brownies
+      nombre: Tortas, budines y brownies
+    - id: chocolate
+      nombre: Chocolate
+
+- id: helados
+  nombre: Helados
+  sub:
+    - id: paletas
+      nombre: Paletas
+
+- id: basicos
+  nombre: Básicos
+  aclaracion: se usan en otras recetas

@@ -1,0 +1,251 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { leerArbol, nombreDeRama } from '../lib/categorias.js';
+import { ETIQUETAS, etiquetaIngrediente, htmlIngrediente, htmlCantidad, reemplazarCantidades } from '../lib/receta.js';
+import { numero } from '../lib/escala.js';
+
+export async function getStaticPaths() {
+  const recetas = await getCollection('recetas');
+  return recetas.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const r = entry.data;
+const base = import.meta.env.BASE_URL;
+const arbol = leerArbol();
+
+await render(entry); // asegura que el HTML del cuerpo esté armado
+const cuerpo = reemplazarCantidades(entry.rendered?.html ?? '', r, entry.filePath ?? entry.id);
+
+// Lo que se puede usar para «desde un ingrediente»: lo que tiene cantidad y escala.
+const pesables = r.ingredientes.flatMap((g) =>
+  g.lista.filter((i) => i.cantidad !== undefined && i.escala).map((i) => ({
+    nombre: i.nombre,
+    base: Array.isArray(i.cantidad) ? i.cantidad[0] : i.cantidad,
+    unidad: i.unidad,
+  })),
+);
+const hayIngredientes = r.ingredientes.length > 0;
+const moldeTexto =
+  r.molde && (r.molde.forma === 'redondo' ? `redondo de ${numero(r.molde.diametro)} cm` : `${numero(r.molde.ancho)} × ${numero(r.molde.largo)} cm`);
+---
+
+<Base titulo={r.titulo}>
+  <button slot="barra" class="boton" type="button" id="pantalla" aria-pressed="false" hidden>Pantalla encendida: no</button>
+
+  <h1>
+    {r.titulo}
+    {r.estado !== 'final' && <span class="estado">{ETIQUETAS.estado[r.estado]}</span>}
+  </h1>
+  <p class="meta">
+    {r.categorias.map((c, i) => (
+      <>{i > 0 && ' · '}<a href={`${base}?cat=${c}`}>{nombreDeRama(c, arbol)}</a></>
+    ))}
+    <br />
+    {ETIQUETAS.sabor[r.sabor]} · {r.equipo.map((e) => ETIQUETAS.equipo[e]).join(', ')} · {r.ingrediente_principal.map(etiquetaIngrediente).join(', ')}
+  </p>
+
+  {r.fuente && (
+    <div class="caja">
+      {r.fuente.autor && (
+        <p><b>Fuente:</b> {r.fuente.link ? <a href={r.fuente.link} rel="noopener">{r.fuente.autor}</a> : r.fuente.autor}</p>
+      )}
+      {!r.fuente.autor && r.fuente.link && <p><b>Fuente:</b> <a href={r.fuente.link} rel="noopener">{r.fuente.link}</a></p>}
+      {r.fuente.aclaracion && <p>{r.fuente.aclaracion}</p>}
+    </div>
+  )}
+
+  {r.datos.length > 0 && (
+    <ul class="datos">
+      {r.datos.flatMap((d) => Object.entries(d)).map(([k, v]) => <li><b>{k}:</b> {v}</li>)}
+    </ul>
+  )}
+
+  {hayIngredientes && (
+    <section class="escalar" id="escalar">
+      <div class="fila">
+        <span class="factor" id="factor">×1</span>
+        <button class="chip" type="button" data-x="0.5">×½</button>
+        <button class="chip" type="button" data-x="1">×1</button>
+        <button class="chip" type="button" data-x="2">×2</button>
+      </div>
+      <details>
+        <summary>Otras formas de escalar</summary>
+        <div class="modos">
+          <div class="modo">
+            <label for="x-libre">Por un número</label>
+            <div class="fila"><input id="x-libre" inputmode="decimal" placeholder="1,5" /></div>
+          </div>
+          {r.rinde && (
+            <div class="modo">
+              <label for="x-rinde">Por lo que rinde (la receta da {numero(r.rinde.cantidad)} {r.rinde.unidad})</label>
+              <div class="fila"><input id="x-rinde" inputmode="numeric" data-base={r.rinde.cantidad} /> <span>{r.rinde.unidad}</span></div>
+            </div>
+          )}
+          {r.molde && (
+            <div class="modo" id="modo-molde" data-molde={JSON.stringify(r.molde)}>
+              <label>Por molde (la receta es para {moldeTexto}; mismo espesor)</label>
+              <div class="fila">
+                <select id="m-forma" aria-label="Forma del molde">
+                  <option value="rectangular">Rectangular</option>
+                  <option value="redondo">Redondo</option>
+                </select>
+                <input id="m-ancho" inputmode="decimal" placeholder="ancho" aria-label="Ancho en cm" />
+                <span class="m-rect">×</span>
+                <input id="m-largo" class="m-rect" inputmode="decimal" placeholder="largo" aria-label="Largo en cm" />
+                <span>cm</span>
+              </div>
+            </div>
+          )}
+          {pesables.length > 0 && (
+            <div class="modo">
+              <label for="d-ing">Desde un ingrediente: elegilo y poné cuánto tenés</label>
+              <div class="fila">
+                <select id="d-ing">
+                  {pesables.map((p) => (
+                    <option value={p.base} data-unidad={p.unidad}>{p.nombre}</option>
+                  ))}
+                </select>
+                <input id="d-cant" inputmode="decimal" aria-label="Cantidad que tengo" /> <span id="d-unidad">{pesables[0].unidad}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </details>
+    </section>
+  )}
+
+  {hayIngredientes && <h2>Ingredientes</h2>}
+  {r.ingredientes.map((g) => (
+    <>
+      {g.grupo && <h3>{g.grupo}</h3>}
+      {g.aclaracion && <p class="grupo-aclaracion">{g.aclaracion}</p>}
+      <ul class="ingredientes">
+        {g.lista.map((i) => (
+          <li>
+            <label>
+              <input type="checkbox" />
+              <span>
+                <Fragment set:html={htmlIngrediente(i)} /> {i.nombre}
+                {i.opcional && <span class="opcional">opcional</span>}
+                {i.alternativa && (
+                  <span class="extra">o <Fragment set:html={htmlCantidad(i.alternativa.cantidad, i.alternativa.unidad)} /> de {i.alternativa.nombre}</span>
+                )}
+                {i.nota && <span class="extra">{i.nota}</span>}
+                {i.funcion && <span class="extra">Para qué: {i.funcion}</span>}
+              </span>
+            </label>
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
+
+  <div class="cuerpo"><Fragment set:html={cuerpo} /></div>
+</Base>
+
+<script>
+  import { cantidad, rinde, factorPorMolde, factorDesde, leerNumero, numero } from '../lib/escala.js';
+
+  const cantidades = [...document.querySelectorAll('.cant[data-base]')];
+  const salida = document.getElementById('factor');
+
+  function aplicar(factor, origen) {
+    for (const el of cantidades) {
+      const base = el.dataset.base.split(',').map(Number);
+      const unidad = el.dataset.unidad;
+      el.textContent = el.hasAttribute('data-entero')
+        ? `${rinde(base[0], factor)} ${unidad}`
+        : cantidad(base.length > 1 ? base : base[0], factor, unidad);
+    }
+    if (salida) salida.textContent = `×${numero(Math.round(factor * 100) / 100)}`;
+    for (const b of document.querySelectorAll('[data-x]')) b.setAttribute('aria-pressed', String(Number(b.dataset.x) === factor));
+    // Los otros campos se vacían para que no muestren algo que ya no vale.
+    for (const id of ['x-libre', 'x-rinde', 'd-cant', 'm-ancho', 'm-largo']) {
+      const campo = document.getElementById(id);
+      if (campo && campo !== origen && !(origen?.id?.startsWith('m-') && id.startsWith('m-'))) campo.value = '';
+    }
+    history.replaceState(null, '', factor === 1 ? location.pathname + location.search : `#x=${Math.round(factor * 10000) / 10000}`);
+  }
+
+  document.querySelectorAll('[data-x]').forEach((b) => b.addEventListener('click', () => aplicar(Number(b.dataset.x), b)));
+
+  document.getElementById('x-libre')?.addEventListener('input', (e) => {
+    const f = leerNumero(e.target.value);
+    if (f) aplicar(f, e.target);
+  });
+
+  const xRinde = document.getElementById('x-rinde');
+  xRinde?.addEventListener('input', () => {
+    const quiero = leerNumero(xRinde.value);
+    if (quiero) aplicar(quiero / Number(xRinde.dataset.base), xRinde);
+  });
+
+  const modoMolde = document.getElementById('modo-molde');
+  if (modoMolde) {
+    const original = JSON.parse(modoMolde.dataset.molde);
+    const forma = document.getElementById('m-forma');
+    const ancho = document.getElementById('m-ancho');
+    const largo = document.getElementById('m-largo');
+    const porMolde = (e) => {
+      const redondo = forma.value === 'redondo';
+      modoMolde.querySelectorAll('.m-rect').forEach((el) => (el.hidden = redondo));
+      ancho.placeholder = redondo ? 'diámetro' : 'ancho';
+      const a = leerNumero(ancho.value);
+      const l = leerNumero(largo.value);
+      if (redondo && a) aplicar(factorPorMolde(original, { forma: 'redondo', diametro: a }), e.target);
+      if (!redondo && a && l) aplicar(factorPorMolde(original, { forma: 'rectangular', ancho: a, largo: l }), e.target);
+    };
+    forma.addEventListener('change', porMolde);
+    ancho.addEventListener('input', porMolde);
+    largo.addEventListener('input', porMolde);
+  }
+
+  const dCant = document.getElementById('d-cant');
+  const dIng = document.getElementById('d-ing');
+  const desde = (e) => {
+    document.getElementById('d-unidad').textContent = dIng.selectedOptions[0].dataset.unidad;
+    const tengo = leerNumero(dCant.value);
+    if (tengo) aplicar(factorDesde(Number(dIng.value), tengo), dCant);
+  };
+  dCant?.addEventListener('input', desde);
+  dIng?.addEventListener('change', desde);
+
+  const inicial = leerNumero(new URLSearchParams(location.hash.slice(1)).get('x') ?? '');
+  if (inicial && cantidades.length) aplicar(inicial, null);
+  else document.querySelector('[data-x="1"]')?.setAttribute('aria-pressed', 'true');
+
+  // Pantalla encendida mientras se cocina (Chrome Android, Safari iOS 16.4+).
+  const boton = document.getElementById('pantalla');
+  if ('wakeLock' in navigator) {
+    let bloqueo = null;
+    let quiere = false;
+    const mostrar = () => {
+      boton.setAttribute('aria-pressed', String(!!bloqueo));
+      boton.textContent = bloqueo ? 'Pantalla encendida: sí' : 'Pantalla encendida: no';
+    };
+    const pedir = async () => {
+      try {
+        bloqueo = await navigator.wakeLock.request('screen');
+        bloqueo.addEventListener('release', () => {
+          bloqueo = null;
+          mostrar();
+        });
+      } catch {
+        bloqueo = null;
+      }
+      mostrar();
+    };
+    boton.hidden = false;
+    boton.addEventListener('click', async () => {
+      quiere = !bloqueo;
+      if (bloqueo) await bloqueo.release();
+      else await pedir();
+    });
+    // Al volver a la pestaña el navegador lo suelta: se vuelve a pedir.
+    document.addEventListener('visibilitychange', () => {
+      if (quiere && !bloqueo && document.visibilityState === 'visible') pedir();
+    });
+  }
+</script>

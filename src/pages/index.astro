@@ -1,0 +1,188 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { leerArbol, nombreDeRama } from '../lib/categorias.js';
+import { ETIQUETAS, etiquetaIngrediente } from '../lib/receta.js';
+import { normalizar } from '../lib/filtros.js';
+
+const base = import.meta.env.BASE_URL;
+const arbol = leerArbol();
+const recetas = (await getCollection('recetas')).sort((a, b) => a.data.titulo.localeCompare(b.data.titulo, 'es'));
+
+// Las sub-ramas se muestran solo si alguna receta las usa.
+const usadas = new Set(recetas.flatMap((r) => r.data.categorias));
+const ramas = arbol.map((r) => ({ ...r, sub: r.sub.filter((s) => usadas.has(s.id)) }));
+
+const ingredientes = [...new Set(recetas.flatMap((r) => r.data.ingrediente_principal))].sort((a, b) => a.localeCompare(b, 'es'));
+
+const transversales = [
+  { grupo: 'sabor', titulo: 'Dulce o salado', valores: Object.entries(ETIQUETAS.sabor) },
+  { grupo: 'equipo', titulo: 'Equipo', valores: Object.entries(ETIQUETAS.equipo) },
+  { grupo: 'ing', titulo: 'Ingrediente principal', valores: ingredientes.map((i) => [i, etiquetaIngrediente(i)]) },
+];
+
+// Lo que el buscador mira: título, ingredientes y etiquetas.
+const textoDe = (r) =>
+  normalizar(
+    [
+      r.data.titulo,
+      ...r.data.ingredientes.flatMap((g) => g.lista.map((i) => i.nombre)),
+      ...r.data.ingrediente_principal,
+      ...r.data.categorias.map((c) => nombreDeRama(c, arbol)),
+    ].join(' '),
+  );
+---
+
+<Base>
+  <input class="buscar" id="buscar" type="search" placeholder="Buscar: chocolate, paleta, harina…" autocomplete="off" />
+
+  <div class="filtros">
+    <div>
+      <div class="grupo-titulo">Tipo de comida</div>
+      <div class="chips desliza" id="ramas">
+        {ramas.map((r) => (
+          <button class="chip grande" type="button" data-cat={r.id} aria-pressed="false">
+            {r.nombre} <span class="n"></span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {ramas.filter((r) => r.sub.length).map((r) => (
+      <div class="sub-ramas chips" data-padre={r.id} hidden>
+        {r.sub.map((s) => (
+          <button class="chip" type="button" data-cat={s.id} aria-pressed="false">
+            {s.nombre} <span class="n"></span>
+          </button>
+        ))}
+      </div>
+    ))}
+
+    {transversales.map((t) => (
+      <div>
+        <div class="grupo-titulo">{t.titulo}</div>
+        <div class="chips desliza">
+          {t.valores.map(([valor, nombre]) => (
+            <button class="chip" type="button" data-grupo={t.grupo} data-valor={valor} aria-pressed="false">
+              {nombre} <span class="n"></span>
+            </button>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="resumen">
+    <span id="cuantas"></span>
+    <button class="limpiar" type="button" id="limpiar" hidden>Ver todas</button>
+  </div>
+
+  {ramas.map((r) => (
+    <p class="vacia" data-vacia={r.id} hidden>
+      Todavía no hay recetas en {r.nombre}{r.aclaracion && ` (${r.aclaracion})`}.
+    </p>
+  ))}
+  <p class="vacia" id="sin-resultados" hidden>Ninguna receta cumple todo lo elegido.</p>
+
+  <ul class="tarjetas" id="tarjetas">
+    {recetas.map((r) => (
+      <li
+        class="tarjeta"
+        data-cats={r.data.categorias.join(' ')}
+        data-sabor={r.data.sabor}
+        data-equipo={r.data.equipo.join(' ')}
+        data-ing={r.data.ingrediente_principal.join(' ')}
+        data-texto={textoDe(r)}
+      >
+        <a href={`${base}${r.id}/`}>
+          <span class="t">{r.data.titulo}</span>
+          {r.data.estado !== 'final' && <span class="estado">{ETIQUETAS.estado[r.data.estado]}</span>}
+          <span class="r" style="display:block">{r.data.categorias.map((c) => nombreDeRama(c, arbol)).join(' · ')}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Base>
+
+<script>
+  import { vacia, filtrar, contarRama, contarValor, alternar, leerSeleccion, escribirSeleccion, enRama } from '../lib/filtros.js';
+
+  const tarjetas = [...document.querySelectorAll('.tarjeta')];
+  const recetas = tarjetas.map((el) => ({
+    el,
+    cats: el.dataset.cats.split(' '),
+    sabor: [el.dataset.sabor],
+    equipo: el.dataset.equipo.split(' '),
+    ing: el.dataset.ing.split(' '),
+    texto: el.dataset.texto,
+  }));
+  const buscar = document.getElementById('buscar');
+  let sel = { ...vacia(), ...leerSeleccion(location.search) };
+  buscar.value = sel.q;
+
+  function pintar() {
+    const quedan = new Set(filtrar(recetas, sel));
+    for (const r of recetas) r.el.hidden = !quedan.has(r);
+
+    const padre = sel.cat.split('/')[0];
+    for (const b of document.querySelectorAll('[data-cat]')) {
+      const cat = b.dataset.cat;
+      const elegida = sel.cat === cat || (!cat.includes('/') && padre === cat);
+      b.setAttribute('aria-pressed', String(elegida));
+      const n = contarRama(recetas, sel, cat);
+      b.querySelector('.n').textContent = n;
+      // Las ramas grandes nunca se apagan: tocar una vacía muestra su aviso.
+      b.disabled = cat.includes('/') && n === 0 && !elegida;
+    }
+    for (const fila of document.querySelectorAll('[data-padre]')) fila.hidden = fila.dataset.padre !== padre;
+
+    for (const b of document.querySelectorAll('[data-grupo]')) {
+      const { grupo, valor } = b.dataset;
+      const elegido = sel[grupo].includes(valor);
+      const n = contarValor(recetas, sel, grupo, valor);
+      b.setAttribute('aria-pressed', String(elegido));
+      b.querySelector('.n').textContent = n;
+      b.disabled = n === 0 && !elegido;
+    }
+
+    const ramaVacia = padre && !recetas.some((r) => enRama(r, padre));
+    for (const p of document.querySelectorAll('[data-vacia]')) p.hidden = !(ramaVacia && p.dataset.vacia === padre);
+    document.getElementById('sin-resultados').hidden = quedan.size > 0 || ramaVacia;
+
+    const hayAlgo = escribirSeleccion(sel) !== '';
+    document.getElementById('cuantas').textContent = hayAlgo
+      ? `${quedan.size} de ${recetas.length} recetas`
+      : `${recetas.length} recetas`;
+    document.getElementById('limpiar').hidden = !hayAlgo;
+    history.replaceState(null, '', location.pathname + escribirSeleccion(sel));
+  }
+
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.cat !== undefined) {
+      const cat = b.dataset.cat;
+      // Tocar lo que ya está elegido lo suelta (una sub-rama vuelve a su rama).
+      if (sel.cat === cat) sel.cat = cat.includes('/') ? cat.split('/')[0] : '';
+      else sel.cat = cat;
+    } else if (b.dataset.grupo) {
+      sel[b.dataset.grupo] = alternar(sel[b.dataset.grupo], b.dataset.valor);
+    } else if (b.id === 'limpiar') {
+      sel = vacia();
+      buscar.value = '';
+    } else return;
+    pintar();
+  });
+  buscar.addEventListener('input', () => {
+    sel.q = buscar.value.trim();
+    pintar();
+  });
+  pintar();
+  // Si se entró con una rama elegida, que se vea aunque esté al final de la fila.
+  const fila = document.getElementById('ramas');
+  const elegida = fila.querySelector('[aria-pressed="true"]');
+  if (elegida) {
+    const corrimiento = elegida.getBoundingClientRect().left - fila.getBoundingClientRect().left;
+    fila.scrollLeft += corrimiento - (fila.clientWidth - elegida.offsetWidth) / 2;
+  }
+</script>
