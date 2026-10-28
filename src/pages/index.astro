@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { leerArbol, nombreDeRama } from '../lib/categorias.js';
+import { leerArbol, nombreDeRama, colorDeRama } from '../lib/categorias.js';
 import { ETIQUETAS, etiquetaIngrediente } from '../lib/receta.js';
 import { normalizar } from '../lib/filtros.js';
 
@@ -39,9 +39,9 @@ const textoDe = (r) =>
   <div class="filtros">
     <div>
       <div class="grupo-titulo">Tipo de comida</div>
-      <div class="chips desliza" id="ramas">
+      <div class="chips" id="ramas">
         {ramas.map((r) => (
-          <button class="chip grande" type="button" data-cat={r.id} aria-pressed="false">
+          <button class={`chip grande c-${r.color}`} type="button" data-cat={r.id} aria-pressed="false">
             {r.nombre} <span class="n"></span>
           </button>
         ))}
@@ -49,7 +49,7 @@ const textoDe = (r) =>
     </div>
 
     {ramas.filter((r) => r.sub.length).map((r) => (
-      <div class="sub-ramas chips" data-padre={r.id} hidden>
+      <div class={`sub-ramas chips c-${r.color}`} data-padre={r.id} hidden>
         {r.sub.map((s) => (
           <button class="chip" type="button" data-cat={s.id} aria-pressed="false">
             {s.nombre} <span class="n"></span>
@@ -61,7 +61,7 @@ const textoDe = (r) =>
     {transversales.map((t) => (
       <div>
         <div class="grupo-titulo">{t.titulo}</div>
-        <div class="chips desliza">
+        <div class="chips">
           {t.valores.map(([valor, nombre]) => (
             <button class="chip" type="button" data-grupo={t.grupo} data-valor={valor} aria-pressed="false">
               {nombre} <span class="n"></span>
@@ -87,7 +87,7 @@ const textoDe = (r) =>
   <ul class="tarjetas" id="tarjetas">
     {recetas.map((r) => (
       <li
-        class="tarjeta"
+        class={`tarjeta c-${colorDeRama(r.data.categorias[0], arbol)}`}
         data-cats={r.data.categorias.join(' ')}
         data-sabor={r.data.sabor}
         data-equipo={r.data.equipo.join(' ')}
@@ -178,11 +178,4 @@ const textoDe = (r) =>
     pintar();
   });
   pintar();
-  // Si se entró con una rama elegida, que se vea aunque esté al final de la fila.
-  const fila = document.getElementById('ramas');
-  const elegida = fila.querySelector('[aria-pressed="true"]');
-  if (elegida) {
-    const corrimiento = elegida.getBoundingClientRect().left - fila.getBoundingClientRect().left;
-    fila.scrollLeft += corrimiento - (fila.clientWidth - elegida.offsetWidth) / 2;
-  }
 </script>

@@ -4,9 +4,11 @@
 # - Las sub-ramas aparecen solas cuando alguna receta las usa.
 # - Una receta las nombra por su id: "helados" o "helados/paletas".
 #   Puede nombrar varias.
+# - color: verde, amarillo, naranja, violeta, indigo o celeste.
 # - Para sumar una rama o una sub-rama, se agrega acá y listo.
 
 - id: comidas-principales
+  color: verde
   nombre: Comidas principales
   aclaracion: almuerzo y cena
   sub:
@@ -20,18 +22,21 @@
       nombre: Verduras
 
 - id: panes-y-masas
+  color: amarillo
   nombre: Panes y masas
   sub:
     - id: panes
       nombre: Panes
 
 - id: desayuno-y-merienda
+  color: naranja
   nombre: Desayuno y merienda
   sub:
     - id: waffles
       nombre: Waffles
 
 - id: postres-y-pasteleria
+  color: violeta
   nombre: Postres y pastelería
   sub:
     - id: tortas-budines-y-brownies
@@ -40,11 +45,13 @@
       nombre: Chocolate
 
 - id: helados
+  color: celeste
   nombre: Helados
   sub:
     - id: paletas
       nombre: Paletas
 
 - id: basicos
+  color: indigo
   nombre: Básicos
   aclaracion: se usan en otras recetas

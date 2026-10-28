@@ -18,6 +18,7 @@ datos:
   - Azúcar total: ≈13 % de la mezcla, rango de heladería
 ingredientes:
   - grupo: Extracción de leche de coco
+    fuera_de_la_masa: true
     lista:
       - id: coco
         nombre: Coco rallado seco sin azúcar
@@ -86,6 +87,7 @@ ingredientes:
         opcional: true
         nota: solo como corrección final
   - grupo: Cobertura
+    fuera_de_la_masa: true
     lista:
       - id: chocolate-blanco
         nombre: Chocolate blanco

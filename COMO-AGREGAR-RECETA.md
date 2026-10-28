@@ -41,6 +41,12 @@ manda un mail. El error dice qué archivo y qué campo. Los más comunes:
 - Lo que no tiene sentido pesar va con `texto` en vez de `cantidad` («de 1
   limón», «2 o 3 gotas») y no escala.
 - Lo que se pesa pero no conviene escalar lleva `escala: false`.
+- **El huevo** lleva `unidad_natural` (ver la plantilla): así la receta muestra
+  «≈ 3,5 huevos» y se puede escalar por huevos enteros.
+- **Masa total**: suma todo lo que tiene cantidad, menos los opcionales y los
+  grupos con `fuera_de_la_masa: true`. Marcá así las correcciones, las
+  alternativas, las coberturas y las extracciones (como la leche de coco), que
+  no son parte de la masa.
 - Los números fijos en las notas y el registro de pruebas están bien: cuentan lo
   que pasó, no se escalan.
 - Secciones del cuerpo, en este orden: **Procedimiento**, **Notas**, **Cambios
@@ -52,7 +58,9 @@ manda un mail. El error dice qué archivo y qué campo. Los más comunes:
 El árbol vive en `src/data/categorias.yml`. Una receta puede estar en varias
 ramas (la ganache está en «Postres y pastelería › Chocolate» y en «Básicos»).
 Para sumar una rama o una sub-rama, se agrega ahí. Las sub-ramas aparecen en el
-sitio solas cuando alguna receta las usa.
+sitio solas cuando alguna receta las usa. Cada rama grande lleva un `color`
+(verde, amarillo, naranja, violeta, indigo o celeste), que pinta sus botones,
+sus tarjetas y la cabecera de sus recetas.
 
 Los botones de **Dulce / Salado**, **Equipo** e **Ingrediente principal** salen
 de cada receta (`sabor`, `equipo`, `ingrediente_principal`). Un ingrediente

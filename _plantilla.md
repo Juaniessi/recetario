@@ -25,12 +25,21 @@ ingredientes:
         nombre: Harina 0000
         cantidad: 200
         unidad: g            # g o ml, nada más
+      - id: huevo
+        nombre: Huevos, pesados sin cáscara
+        cantidad: 100
+        unidad: g
+        unidad_natural:      # habilita «escalar por huevos» y muestra «≈ 2 huevos»
+          nombre: huevo
+          plural: huevos
+          gramos: 50
       - nombre: Sal
         cantidad: [1, 2]     # rango
         unidad: g
       - nombre: Ralladura de limón
         texto: de 1 limón    # lo que no se pesa: no escala
   - grupo: Cobertura         # opcional: un segundo grupo con título
+    fuera_de_la_masa: true   # no suma a la «masa total» (correcciones, coberturas, extracciones)
     lista:
       - nombre: Chocolate
         cantidad: 100

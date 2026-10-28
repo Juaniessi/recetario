@@ -29,7 +29,10 @@ ingredientes:
         nombre: Huevo, sin cáscara
         cantidad: 50
         unidad: g
-        nota: 1 huevo
+        unidad_natural:
+          nombre: huevo
+          plural: huevos
+          gramos: 50
       - id: sal
         nombre: Sal
         cantidad: 6
@@ -54,6 +57,7 @@ ingredientes:
         cantidad: 180
         unidad: ml
   - grupo: Si después del reposo sigue muy líquida
+    fuera_de_la_masa: true
     aclaracion: Probá primero un waffle antes de corregir toda la tanda.
     lista:
       - id: harina-extra

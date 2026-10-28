@@ -33,6 +33,10 @@ const ingrediente = z
     alternativa: z
       .object({ nombre: z.string(), cantidad: cantidad, unidad: unidad })
       .optional(),
+    // Lo que se cuenta entero: el huevo. Habilita «escalar por huevos».
+    unidad_natural: z
+      .object({ nombre: z.string(), plural: z.string(), gramos: z.number().positive() })
+      .optional(),
   })
   .refine((i) => i.cantidad !== undefined || i.texto !== undefined, {
     message: 'cada ingrediente lleva cantidad + unidad, o texto',
@@ -76,6 +80,8 @@ const recetas = defineCollection({
         z.object({
           grupo: z.string().optional(),
           aclaracion: z.string().optional(),
+          // Correcciones, alternativas, extracciones: no suman a la masa total.
+          fuera_de_la_masa: z.boolean().default(false),
           lista: z.array(ingrediente).min(1),
         }),
       )

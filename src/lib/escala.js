@@ -40,6 +40,37 @@ export function factorDesde(base, tengo) {
   return tengo / pide;
 }
 
+// "Tengo 3 huevos de 50 g" sobre una receta que pide 175 g.
+export function factorPorUnidades(base, unidades, gramosPorUnidad) {
+  return (unidades * gramosPorUnidad) / base;
+}
+
+// 175 g de huevo a 50 g cada uno -> "3,5". Redondea a medio.
+export function unidades(gramos, gramosPorUnidad) {
+  return numero(Math.round((gramos / gramosPorUnidad) * 2) / 2);
+}
+
+// Masa total de la receta: lo que tiene cantidad y escala, sin opcionales ni
+// grupos marcados fuera_de_la_masa. Los ml se cuentan como g (aproximado);
+// un rango cuenta por su punto medio.
+export function masaTotal(ingredientes) {
+  let total = 0;
+  const fuera = [];
+  let hayMl = false;
+  for (const g of ingredientes) {
+    if (g.fuera_de_la_masa) {
+      fuera.push(g.grupo ?? 'un grupo');
+      continue;
+    }
+    for (const i of g.lista) {
+      if (i.cantidad === undefined || !i.escala || i.opcional) continue;
+      total += Array.isArray(i.cantidad) ? (i.cantidad[0] + i.cantidad[1]) / 2 : i.cantidad;
+      if (i.unidad === 'ml') hayMl = true;
+    }
+  }
+  return { total, fuera, hayMl };
+}
+
 // Acepta "2,25" y "2.25". Devuelve null si no es un número positivo.
 export function leerNumero(texto) {
   const valor = Number(String(texto).trim().replace(',', '.'));

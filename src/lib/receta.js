@@ -1,5 +1,5 @@
 // Armado de la página de una receta, al compilar.
-import { cantidad, rinde } from './escala.js';
+import { cantidad, rinde, unidades } from './escala.js';
 
 const escapar = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
@@ -18,6 +18,14 @@ export function htmlRinde(r) {
 export function htmlIngrediente(ing) {
   if (ing.cantidad === undefined) return `<span class="cant fija">${escapar(ing.texto)}</span>`;
   return htmlCantidad(ing.cantidad, ing.unidad, ing.escala);
+}
+
+// "≈ 3,5 huevos", que el script de la página recalcula al escalar.
+export function htmlUnidadNatural(ing) {
+  const u = ing.unidad_natural;
+  if (!u || Array.isArray(ing.cantidad)) return '';
+  const n = unidades(ing.cantidad, u.gramos);
+  return `<span class="natural" data-base="${ing.cantidad}" data-gramos="${u.gramos}" data-nombre="${escapar(u.nombre)}" data-plural="${escapar(u.plural)}">≈ ${n} ${n === '1' ? escapar(u.nombre) : escapar(u.plural)}</span>`;
 }
 
 // Reemplaza {id} y {rinde} en el procedimiento por la cantidad escalable.

@@ -46,6 +46,20 @@ En el navegador de la app de Claude: `preview_start` con el nombre `recetario`
   solo si tienen recetas. Tres grupos de botones transversales: Dulce / Salado,
   Equipo e Ingrediente principal. Dentro de un grupo suman; entre grupos restan.
 - **Sistema métrico siempre**, también el huevo (50 g = 1 huevo).
+
+## Cambios del 28/10/2026, tarde (pedido de Juan)
+
+- **Brownie con base 20 × 20 y chocolate 70 %** (sus números). La versión de
+  30 × 30 con 54 % quedó en el registro de pruebas.
+- **Seis formas de escalar, a la vista en pestañas**: molde, huevos, un
+  ingrediente (por ejemplo, «quiero usar 700 g de harina»), masa total («quiero
+  1 kg de masa»), lo que rinde y un número. **Por huevos** existe porque romper
+  un huevo y usar una parte desperdicia: el peso de cada huevo se puede cambiar y
+  el navegador lo recuerda entre recetas.
+- **Paleta clara y en pastel**, sin modo oscuro: un color por rama grande
+  (verde, amarillo, naranja, violeta, celeste, índigo) en `categorias.yml`.
+- **Los botones bajan de renglón** en vez de deslizarse de costado: la fila
+  cortada a la derecha no le gustaba.
 - **La cobertura de chocolate no tenía cantidades** («aceite 5–8 % del
   chocolate»): se le puso una base de 200 g de chocolate para que escale.
 - **Astro 7 y no 5**: la 5 tenía avisos de seguridad críticos de npm.

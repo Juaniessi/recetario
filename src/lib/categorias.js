@@ -9,6 +9,7 @@ export function leerArbol() {
     id: rama.id,
     nombre: rama.nombre,
     aclaracion: rama.aclaracion ?? '',
+    color: rama.color ?? 'indigo',
     sub: (rama.sub ?? []).map((s) => ({ id: `${rama.id}/${s.id}`, nombre: s.nombre })),
   }));
 }
@@ -16,6 +17,11 @@ export function leerArbol() {
 // Todos los ids válidos: "helados" y "helados/paletas".
 export function idsValidos(arbol = leerArbol()) {
   return new Set(arbol.flatMap((r) => [r.id, ...r.sub.map((s) => s.id)]));
+}
+
+// El color de una receta es el de la rama grande de su primera categoría.
+export function colorDeRama(id, arbol = leerArbol()) {
+  return arbol.find((r) => r.id === id.split('/')[0])?.color ?? 'indigo';
 }
 
 // "postres-y-pasteleria/chocolate" -> "Postres y pastelería › Chocolate"

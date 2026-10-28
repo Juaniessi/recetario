@@ -44,6 +44,7 @@ ingredientes:
         unidad: g
         funcion: realza el sabor
   - grupo: Si queda algo «babosa» (mejora posible de textura)
+    fuera_de_la_masa: true
     aclaracion: En lugar de la xantana sola, no además.
     lista:
       - id: xantana-mezcla

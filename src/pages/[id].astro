@@ -1,9 +1,9 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { leerArbol, nombreDeRama } from '../lib/categorias.js';
-import { ETIQUETAS, etiquetaIngrediente, htmlIngrediente, htmlCantidad, reemplazarCantidades } from '../lib/receta.js';
-import { numero } from '../lib/escala.js';
+import { leerArbol, nombreDeRama, colorDeRama } from '../lib/categorias.js';
+import { ETIQUETAS, etiquetaIngrediente, htmlIngrediente, htmlCantidad, htmlUnidadNatural, reemplazarCantidades } from '../lib/receta.js';
+import { numero, masaTotal, cantidad, unidades } from '../lib/escala.js';
 
 export async function getStaticPaths() {
   const recetas = await getCollection('recetas');
@@ -14,37 +14,52 @@ const { entry } = Astro.props;
 const r = entry.data;
 const base = import.meta.env.BASE_URL;
 const arbol = leerArbol();
+const color = colorDeRama(r.categorias[0], arbol);
 
 await render(entry); // asegura que el HTML del cuerpo esté armado
 const cuerpo = reemplazarCantidades(entry.rendered?.html ?? '', r, entry.filePath ?? entry.id);
 
-// Lo que se puede usar para «desde un ingrediente»: lo que tiene cantidad y escala.
-const pesables = r.ingredientes.flatMap((g) =>
-  g.lista.filter((i) => i.cantidad !== undefined && i.escala).map((i) => ({
-    nombre: i.nombre,
-    base: Array.isArray(i.cantidad) ? i.cantidad[0] : i.cantidad,
-    unidad: i.unidad,
-  })),
-);
-const hayIngredientes = r.ingredientes.length > 0;
+const todos = r.ingredientes.flatMap((g) => g.lista);
+// Lo que se puede usar para «un ingrediente»: lo que tiene cantidad y escala.
+const pesables = todos
+  .filter((i) => i.cantidad !== undefined && i.escala)
+  .map((i) => ({ nombre: i.nombre, base: Array.isArray(i.cantidad) ? i.cantidad[0] : i.cantidad, unidad: i.unidad }));
+const huevo = todos.find((i) => i.unidad_natural && !Array.isArray(i.cantidad));
+const masa = masaTotal(r.ingredientes);
 const moldeTexto =
   r.molde && (r.molde.forma === 'redondo' ? `redondo de ${numero(r.molde.diametro)} cm` : `${numero(r.molde.ancho)} × ${numero(r.molde.largo)} cm`);
+
+// Las formas de escalar, en el orden en que conviene ofrecerlas.
+const modos = [
+  r.molde && ['molde', 'Molde'],
+  huevo && ['huevos', 'Huevos'],
+  pesables.length && ['ingrediente', 'Un ingrediente'],
+  masa.total > 0 && ['masa', 'Masa total'],
+  r.rinde && ['rinde', 'Lo que rinde'],
+  pesables.length && ['numero', 'Un número'],
+].filter(Boolean);
+const aclaracionMasa = [masa.hayMl && 'los ml se cuentan como g', 'sin opcionales', ...masa.fuera.map((g) => `sin «${g}»`)]
+  .filter(Boolean)
+  .join(', ');
 ---
 
-<Base titulo={r.titulo}>
-  <button slot="barra" class="boton" type="button" id="pantalla" aria-pressed="false" hidden>Pantalla encendida: no</button>
+<Base titulo={r.titulo} color={color}>
+  <button slot="barra" class="boton pantalla" type="button" id="pantalla" aria-pressed="false" hidden>Pantalla encendida: no</button>
 
-  <h1>
-    {r.titulo}
-    {r.estado !== 'final' && <span class="estado">{ETIQUETAS.estado[r.estado]}</span>}
-  </h1>
-  <p class="meta">
-    {r.categorias.map((c, i) => (
-      <>{i > 0 && ' · '}<a href={`${base}?cat=${c}`}>{nombreDeRama(c, arbol)}</a></>
-    ))}
-    <br />
-    {ETIQUETAS.sabor[r.sabor]} · {r.equipo.map((e) => ETIQUETAS.equipo[e]).join(', ')} · {r.ingrediente_principal.map(etiquetaIngrediente).join(', ')}
-  </p>
+  <header class={`cabeza c-${color}`}>
+    <p class="ramas">
+      {r.categorias.map((c, i) => (
+        <>{i > 0 && ' · '}<a href={`${base}?cat=${c}`}>{nombreDeRama(c, arbol)}</a></>
+      ))}
+    </p>
+    <h1>
+      {r.titulo}
+      {r.estado !== 'final' && <span class="estado">{ETIQUETAS.estado[r.estado]}</span>}
+    </h1>
+    <p class="meta">
+      {ETIQUETAS.sabor[r.sabor]} · {r.equipo.map((e) => ETIQUETAS.equipo[e]).join(', ')} · {r.ingrediente_principal.map(etiquetaIngrediente).join(', ')}
+    </p>
+  </header>
 
   {r.fuente && (
     <div class="caja">
@@ -62,61 +77,105 @@ const moldeTexto =
     </ul>
   )}
 
-  {hayIngredientes && (
-    <section class="escalar" id="escalar">
-      <div class="fila">
-        <span class="factor" id="factor">×1</span>
-        <button class="chip" type="button" data-x="0.5">×½</button>
-        <button class="chip" type="button" data-x="1">×1</button>
-        <button class="chip" type="button" data-x="2">×2</button>
+  {modos.length > 0 && (
+    <>
+      <div class="factor-barra">
+        <span class="factor-texto">Cantidades <b id="factor">×1</b></span>
+        <span class="chips">
+          <button class="chip" type="button" data-x="0.5">×½</button>
+          <button class="chip" type="button" data-x="1">×1</button>
+          <button class="chip" type="button" data-x="2">×2</button>
+        </span>
       </div>
-      <details>
-        <summary>Otras formas de escalar</summary>
-        <div class="modos">
-          <div class="modo">
-            <label for="x-libre">Por un número</label>
-            <div class="fila"><input id="x-libre" inputmode="decimal" placeholder="1,5" /></div>
-          </div>
-          {r.rinde && (
-            <div class="modo">
-              <label for="x-rinde">Por lo que rinde (la receta da {numero(r.rinde.cantidad)} {r.rinde.unidad})</label>
-              <div class="fila"><input id="x-rinde" inputmode="numeric" data-base={r.rinde.cantidad} /> <span>{r.rinde.unidad}</span></div>
-            </div>
-          )}
-          {r.molde && (
-            <div class="modo" id="modo-molde" data-molde={JSON.stringify(r.molde)}>
-              <label>Por molde (la receta es para {moldeTexto}; mismo espesor)</label>
-              <div class="fila">
-                <select id="m-forma" aria-label="Forma del molde">
-                  <option value="rectangular">Rectangular</option>
-                  <option value="redondo">Redondo</option>
-                </select>
-                <input id="m-ancho" inputmode="decimal" placeholder="ancho" aria-label="Ancho en cm" />
-                <span class="m-rect">×</span>
-                <input id="m-largo" class="m-rect" inputmode="decimal" placeholder="largo" aria-label="Largo en cm" />
-                <span>cm</span>
-              </div>
-            </div>
-          )}
-          {pesables.length > 0 && (
-            <div class="modo">
-              <label for="d-ing">Desde un ingrediente: elegilo y poné cuánto tenés</label>
-              <div class="fila">
-                <select id="d-ing">
-                  {pesables.map((p) => (
-                    <option value={p.base} data-unidad={p.unidad}>{p.nombre}</option>
-                  ))}
-                </select>
-                <input id="d-cant" inputmode="decimal" aria-label="Cantidad que tengo" /> <span id="d-unidad">{pesables[0].unidad}</span>
-              </div>
-            </div>
-          )}
+
+      <section class="escalar">
+        <h2>Escalar por…</h2>
+        <div class="chips" role="tablist">
+          {modos.map(([id, nombre], i) => (
+            <button class="chip" type="button" role="tab" data-modo={id} aria-selected={String(i === 0)}>{nombre}</button>
+          ))}
         </div>
-      </details>
-    </section>
+
+        {r.molde && (
+          <div class="modo" data-panel="molde" data-molde={JSON.stringify(r.molde)}>
+            <p class="ayuda">La receta es para un molde {moldeTexto}. Mismo espesor: escala por superficie.</p>
+            <div class="fila">
+              <select id="m-forma" aria-label="Forma del molde">
+                <option value="rectangular">Rectangular</option>
+                <option value="redondo">Redondo</option>
+              </select>
+              <input id="m-ancho" inputmode="decimal" placeholder="ancho" aria-label="Ancho en cm" />
+              <span class="m-rect">×</span>
+              <input id="m-largo" class="m-rect" inputmode="decimal" placeholder="largo" aria-label="Largo en cm" />
+              <span>cm</span>
+            </div>
+          </div>
+        )}
+
+        {huevo && (
+          <div class="modo" data-panel="huevos" hidden data-base={huevo.cantidad}>
+            <p class="ayuda">
+              La receta pide {numero(huevo.cantidad)} g de huevo, unos {unidades(huevo.cantidad, huevo.unidad_natural.gramos)} {huevo.unidad_natural.plural}. Elegí cuántos enteros vas a usar y no sobra medio huevo.
+            </p>
+            <div class="fila">
+              <span>Tengo</span>
+              <input id="h-cant" inputmode="numeric" aria-label="Cantidad de huevos" />
+              <span>{huevo.unidad_natural.plural} de</span>
+              <input id="h-peso" inputmode="decimal" value={huevo.unidad_natural.gramos} aria-label="Gramos de cada huevo" />
+              <span>g cada uno, sin cáscara</span>
+            </div>
+            <p class="ayuda">Más preciso: rompelos, pesalos juntos y poné ese peso en «Un ingrediente».</p>
+          </div>
+        )}
+
+        {pesables.length > 0 && (
+          <div class="modo" data-panel="ingrediente" hidden>
+            <p class="ayuda">Elegí un ingrediente y poné cuánto querés usar: el resto acompaña.</p>
+            <div class="fila">
+              <select id="d-ing" aria-label="Ingrediente">
+                {pesables.map((p) => (
+                  <option value={p.base} data-unidad={p.unidad}>{p.nombre}</option>
+                ))}
+              </select>
+              <input id="d-cant" inputmode="decimal" aria-label="Cantidad que quiero usar" />
+              <span id="d-unidad">{pesables[0].unidad}</span>
+            </div>
+          </div>
+        )}
+
+        {masa.total > 0 && (
+          <div class="modo" data-panel="masa" hidden data-base={masa.total}>
+            <p class="ayuda">La receta da {cantidad(masa.total, 1, 'g')} de masa ({aclaracionMasa}).</p>
+            <div class="fila">
+              <span>Quiero</span>
+              <input id="t-cant" inputmode="decimal" placeholder="1000" aria-label="Gramos de masa que quiero" />
+              <span>g de masa</span>
+            </div>
+          </div>
+        )}
+
+        {r.rinde && (
+          <div class="modo" data-panel="rinde" hidden>
+            <p class="ayuda">La receta da {numero(r.rinde.cantidad)} {r.rinde.unidad}.</p>
+            <div class="fila">
+              <span>Quiero</span>
+              <input id="x-rinde" inputmode="numeric" data-base={r.rinde.cantidad} aria-label="Cuánto quiero" />
+              <span>{r.rinde.unidad}</span>
+            </div>
+          </div>
+        )}
+
+        <div class="modo" data-panel="numero" hidden>
+          <div class="fila">
+            <span>Multiplicar por</span>
+            <input id="x-libre" inputmode="decimal" placeholder="1,5" aria-label="Factor" />
+          </div>
+        </div>
+      </section>
+    </>
   )}
 
-  {hayIngredientes && <h2>Ingredientes</h2>}
+  {r.ingredientes.length > 0 && <h2>Ingredientes</h2>}
   {r.ingredientes.map((g) => (
     <>
       {g.grupo && <h3>{g.grupo}</h3>}
@@ -129,6 +188,7 @@ const moldeTexto =
               <span>
                 <Fragment set:html={htmlIngrediente(i)} /> {i.nombre}
                 {i.opcional && <span class="opcional">opcional</span>}
+                {i.unidad_natural && <span class="extra"><Fragment set:html={htmlUnidadNatural(i)} /></span>}
                 {i.alternativa && (
                   <span class="extra">o <Fragment set:html={htmlCantidad(i.alternativa.cantidad, i.alternativa.unidad)} /> de {i.alternativa.nombre}</span>
                 )}
@@ -141,17 +201,36 @@ const moldeTexto =
       </ul>
     </>
   ))}
+  {masa.total > 0 && (
+    <p class="masa">Masa total: <Fragment set:html={htmlCantidad(masa.total, 'g')} /> <span class="ayuda">({aclaracionMasa})</span></p>
+  )}
 
   <div class="cuerpo"><Fragment set:html={cuerpo} /></div>
 </Base>
 
 <script>
-  import { cantidad, rinde, factorPorMolde, factorDesde, leerNumero, numero } from '../lib/escala.js';
+  import { cantidad, rinde, factorPorMolde, factorDesde, factorPorUnidades, unidades, leerNumero, numero } from '../lib/escala.js';
 
   const cantidades = [...document.querySelectorAll('.cant[data-base]')];
+  const naturales = [...document.querySelectorAll('.natural')];
   const salida = document.getElementById('factor');
+  const CAMPOS = ['x-libre', 'x-rinde', 'd-cant', 'm-ancho', 'm-largo', 'h-cant', 't-cant'];
+  let actual = 1;
+  // El peso de tus huevos se recuerda entre recetas, en este navegador.
+  let pesoHuevo = null;
+  try {
+    pesoHuevo = leerNumero(localStorage.getItem('peso-huevo') ?? '');
+  } catch {}
+
+  function contarUnidades() {
+    for (const el of naturales) {
+      const n = unidades(Number(el.dataset.base) * actual, pesoHuevo ?? Number(el.dataset.gramos));
+      el.textContent = `≈ ${n} ${n === '1' ? el.dataset.nombre : el.dataset.plural}`;
+    }
+  }
 
   function aplicar(factor, origen) {
+    actual = factor;
     for (const el of cantidades) {
       const base = el.dataset.base.split(',').map(Number);
       const unidad = el.dataset.unidad;
@@ -159,15 +238,26 @@ const moldeTexto =
         ? `${rinde(base[0], factor)} ${unidad}`
         : cantidad(base.length > 1 ? base : base[0], factor, unidad);
     }
+    contarUnidades();
     if (salida) salida.textContent = `×${numero(Math.round(factor * 100) / 100)}`;
     for (const b of document.querySelectorAll('[data-x]')) b.setAttribute('aria-pressed', String(Number(b.dataset.x) === factor));
     // Los otros campos se vacían para que no muestren algo que ya no vale.
-    for (const id of ['x-libre', 'x-rinde', 'd-cant', 'm-ancho', 'm-largo']) {
+    const grupo = origen?.closest?.('.modo');
+    for (const id of CAMPOS) {
       const campo = document.getElementById(id);
-      if (campo && campo !== origen && !(origen?.id?.startsWith('m-') && id.startsWith('m-'))) campo.value = '';
+      if (campo && campo.closest('.modo') !== grupo) campo.value = '';
     }
     history.replaceState(null, '', factor === 1 ? location.pathname + location.search : `#x=${Math.round(factor * 10000) / 10000}`);
   }
+
+  // Pestañas de las formas de escalar.
+  document.querySelectorAll('[data-modo]').forEach((b) =>
+    b.addEventListener('click', () => {
+      document.querySelectorAll('[data-modo]').forEach((o) => o.setAttribute('aria-selected', String(o === b)));
+      document.querySelectorAll('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== b.dataset.modo));
+      document.querySelector(`[data-panel="${b.dataset.modo}"] input`)?.focus();
+    }),
+  );
 
   document.querySelectorAll('[data-x]').forEach((b) => b.addEventListener('click', () => aplicar(Number(b.dataset.x), b)));
 
@@ -182,39 +272,70 @@ const moldeTexto =
     if (quiero) aplicar(quiero / Number(xRinde.dataset.base), xRinde);
   });
 
-  const modoMolde = document.getElementById('modo-molde');
-  if (modoMolde) {
-    const original = JSON.parse(modoMolde.dataset.molde);
+  const panelMolde = document.querySelector('[data-panel="molde"]');
+  if (panelMolde) {
+    const recetaMolde = JSON.parse(panelMolde.dataset.molde);
     const forma = document.getElementById('m-forma');
     const ancho = document.getElementById('m-ancho');
     const largo = document.getElementById('m-largo');
     const porMolde = (e) => {
       const redondo = forma.value === 'redondo';
-      modoMolde.querySelectorAll('.m-rect').forEach((el) => (el.hidden = redondo));
+      panelMolde.querySelectorAll('.m-rect').forEach((el) => (el.hidden = redondo));
       ancho.placeholder = redondo ? 'diámetro' : 'ancho';
       const a = leerNumero(ancho.value);
       const l = leerNumero(largo.value);
-      if (redondo && a) aplicar(factorPorMolde(original, { forma: 'redondo', diametro: a }), e.target);
-      if (!redondo && a && l) aplicar(factorPorMolde(original, { forma: 'rectangular', ancho: a, largo: l }), e.target);
+      if (redondo && a) aplicar(factorPorMolde(recetaMolde, { forma: 'redondo', diametro: a }), e.target);
+      if (!redondo && a && l) aplicar(factorPorMolde(recetaMolde, { forma: 'rectangular', ancho: a, largo: l }), e.target);
     };
     forma.addEventListener('change', porMolde);
     ancho.addEventListener('input', porMolde);
     largo.addEventListener('input', porMolde);
   }
 
+  const panelHuevos = document.querySelector('[data-panel="huevos"]');
+  if (panelHuevos) {
+    const hCant = document.getElementById('h-cant');
+    const hPeso = document.getElementById('h-peso');
+    if (pesoHuevo) hPeso.value = String(pesoHuevo).replace('.', ',');
+    const porHuevos = (e) => {
+      const n = leerNumero(hCant.value);
+      const peso = leerNumero(hPeso.value);
+      if (peso) {
+        pesoHuevo = peso;
+        contarUnidades();
+        try {
+          localStorage.setItem('peso-huevo', String(peso));
+        } catch {}
+      }
+      if (n && peso) aplicar(factorPorUnidades(Number(panelHuevos.dataset.base), n, peso), e.target);
+    };
+    hCant.addEventListener('input', porHuevos);
+    hPeso.addEventListener('input', porHuevos);
+  }
+
   const dCant = document.getElementById('d-cant');
   const dIng = document.getElementById('d-ing');
-  const desde = (e) => {
+  const desde = () => {
     document.getElementById('d-unidad').textContent = dIng.selectedOptions[0].dataset.unidad;
-    const tengo = leerNumero(dCant.value);
-    if (tengo) aplicar(factorDesde(Number(dIng.value), tengo), dCant);
+    const quiero = leerNumero(dCant.value);
+    if (quiero) aplicar(factorDesde(Number(dIng.value), quiero), dCant);
   };
   dCant?.addEventListener('input', desde);
   dIng?.addEventListener('change', desde);
 
+  const panelMasa = document.querySelector('[data-panel="masa"]');
+  const tCant = document.getElementById('t-cant');
+  tCant?.addEventListener('input', () => {
+    const quiero = leerNumero(tCant.value);
+    if (quiero) aplicar(quiero / Number(panelMasa.dataset.base), tCant);
+  });
+
   const inicial = leerNumero(new URLSearchParams(location.hash.slice(1)).get('x') ?? '');
   if (inicial && cantidades.length) aplicar(inicial, null);
-  else document.querySelector('[data-x="1"]')?.setAttribute('aria-pressed', 'true');
+  else {
+    document.querySelector('[data-x="1"]')?.setAttribute('aria-pressed', 'true');
+    contarUnidades();
+  }
 
   // Pantalla encendida mientras se cocina (Chrome Android, Safari iOS 16.4+).
   const boton = document.getElementById('pantalla');

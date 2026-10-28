@@ -10,52 +10,55 @@ fuente:
   autor: Daniel Bui — «Science based Shiny Fudgy Crackle-Top Brownies» (Substack dumpedlingss)
   aclaracion: Basado en su artículo y un reel de Instagram. La receta original está parcialmente detrás de un muro (se habilita gratis registrándose). El azúcar y la harina NO son del autor, son estimaciones propias a partir de proporciones estándar de brownie húmedo.
 rinde:
-  cantidad: 36
+  cantidad: 16
   unidad: cuadrados de 5 cm
 molde:
   forma: rectangular
-  ancho: 30
-  largo: 30
+  ancho: 20
+  largo: 20
 datos:
   - Horno: 170 °C convencional, sin ventilador (160 °C si el molde es de vidrio o de chapa oscura)
   - Temperatura objetivo: 85–88 °C en el centro, con termómetro de pinche
-  - Tiempo real en mi horno: 35–36 minutos (molde de 30 × 30)
+  - Tiempo real en mi horno: 35–36 minutos en molde de 30 × 30 (prueba del 25/10/2026)
   - Reposo: unas 3 horas en el molde antes de cortar
 ingredientes:
   - lista:
       - id: manteca
         nombre: Manteca sin sal, en cubos
-        cantidad: 384
+        cantidad: 175
         unidad: g
       - id: chocolate
-        nombre: Chocolate Tronador 54 %, picado
-        cantidad: 437
+        nombre: Chocolate Tronador 71 %, picado
+        cantidad: 200
         unidad: g
       - id: cacao
         nombre: Cacao amargo en polvo
-        cantidad: 78
+        cantidad: 35
         unidad: g
       - id: sal
         nombre: Sal fina
-        cantidad: 7
+        cantidad: 3
         unidad: g
       - id: cafe
         nombre: Café instantáneo
-        cantidad: 4
+        cantidad: 2
         unidad: g
         opcional: true
       - id: huevo
-        nombre: Huevo a temperatura ambiente, sin cáscara
-        cantidad: 384
+        nombre: Huevos a temperatura ambiente, pesados sin cáscara
+        cantidad: 175
         unidad: g
-        nota: 7 huevos chicos en la tanda de 30 × 30
+        unidad_natural:
+          nombre: huevo
+          plural: huevos
+          gramos: 50
       - id: azucar
         nombre: Azúcar, mitad blanca y mitad rubia
-        cantidad: 481
+        cantidad: 250
         unidad: g
       - id: harina
         nombre: Harina 0000 común (no leudante)
-        cantidad: 170
+        cantidad: 80
         unidad: g
 ---
 
@@ -72,20 +75,19 @@ ingredientes:
 
 ## Notas
 
+- **Escalá por huevos enteros**: romper un huevo y usar una parte desperdicia. Con «Por huevos» ponés cuántos tenés y recalcula el resto; mejor todavía, rompelos, pesalos y usá ese peso en «Un ingrediente».
 - **La superficie con burbujitas** viene del aire del batido de huevos con azúcar. Es estético, no es un error. Se evita golpeando el molde antes de hornear y no dejando la masa esperar.
 - Si el molde es de vidrio o de chapa oscura, bajá a 160 °C.
-- Con chocolate 54 % en vez de 70 % sale algo más dulce y menos intenso. Por eso el azúcar va más bajo que con un 70 %.
-- El tiempo de horno es para el molde de 30 × 30 y este espesor. En otro molde con el mismo espesor debería andar parecido, pero mandá el termómetro.
+- El tiempo de horno es para este espesor. En otro molde con el mismo espesor debería andar parecido, pero mandá el termómetro.
 
 ## Cambios respecto de la original
 
-- **Molde de 30 × 30 en vez de 20 × 20** (escala ×2,25 por superficie, mismo espesor).
-- **Chocolate Tronador 54 % en vez de 70 %**, con menos azúcar para compensar (con un 70 % llevaría unos 250 g de azúcar para 20 × 20).
-- **Ajustada a 384 g de huevo** (7 huevos chicos): el resto se recalculó a partir del huevo. Antes de ese ajuste la base para 20 × 20 era: manteca 175 g, chocolate 200 g, cacao 35 g, sal 3 g, huevo 175 g, azúcar 220 g, harina 78 g.
+- Molde de 20 × 20 y chocolate 70 %, como el original. El azúcar y la harina son estimaciones propias, porque esa parte del artículo no estaba a la vista.
 
 ## Registro de pruebas
 
-- **25/10/2026 — molde de 30 × 30.** Salió bien. Tardó 35–36 minutos. Abrí la puerta a los 27 y a los 37 minutos, así que con el horno cerrado probablemente sean uno o dos minutos menos. A los 27 minutos el centro estaba líquido y marcaba unos 60 °C; que después llegara a 88 °C en unos 9 minutos hace sospechar que esa lectura estuvo mal (por ejemplo, con la punta del termómetro tocando el fondo). La superficie quedó con burbujitas.
+- **25/10/2026 — molde de 30 × 30, con chocolate Tronador 54 %.** Esa tanda iba con 384 g de huevo (7 chicos), 437 g de chocolate y 481 g de azúcar: con el 54 % el azúcar se bajó para compensar. Salió bien. Tardó 35–36 minutos; abrí la puerta a los 27 y a los 37 minutos, así que con el horno cerrado probablemente sean uno o dos minutos menos. A los 27 minutos el centro estaba líquido y marcaba unos 60 °C; que después llegara a 88 °C en unos 9 minutos hace sospechar que esa lectura estuvo mal (por ejemplo, con la punta del termómetro tocando el fondo). La superficie quedó con burbujitas.
+- **28/10/2026 — se pasó a la base de 20 × 20 con chocolate 70 %.** Sin probar todavía con este chocolate.
 
 ## Pendiente
 

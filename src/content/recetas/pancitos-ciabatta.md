@@ -50,6 +50,7 @@ ingredientes:
         unidad: g
         opcional: true
   - grupo: Corrección con harina común, para bajar a 75 % (recomendado)
+    fuera_de_la_masa: true
     aclaracion: Se agrega sobre la masa ya hecha, en dos pasos. Con esto la masa pesa más y salen uno o dos pancitos más.
     lista:
       - id: harina-75
@@ -61,6 +62,7 @@ ingredientes:
         cantidad: [1, 2]
         unidad: g
   - grupo: O para bajar a 70 %
+    fuera_de_la_masa: true
     aclaracion: En lugar de la de 75 %, no además.
     lista:
       - id: harina-70

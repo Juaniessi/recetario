@@ -33,7 +33,10 @@ ingredientes:
         nombre: Huevo, sin cáscara
         cantidad: 50
         unidad: g
-        nota: 1 huevo
+        unidad_natural:
+          nombre: huevo
+          plural: huevos
+          gramos: 50
       - id: sal
         nombre: Sal
         cantidad: 6
