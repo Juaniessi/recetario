@@ -60,6 +60,22 @@ button, input, select { font: inherit; color: inherit; }
   background: var(--c-fuerte, var(--acento)); border-color: var(--c-fuerte, var(--acento)); color: #fff;
 }
 .chip:disabled { opacity: 0.35; cursor: default; }
+
+/* Hover solo donde hay mouse: en el celular quedaría pegado después de tocar. */
+.chip, .boton, .tarjeta a, .limpiar { transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
+@media (hover: hover) {
+  .chip:not(:disabled):not([aria-pressed='true']):not([aria-selected='true']):hover {
+    border-color: var(--c-fuerte, var(--acento));
+    box-shadow: 0 2px 6px rgb(35 37 46 / 0.12);
+    transform: translateY(-1px);
+  }
+  .chip[aria-pressed='true']:hover, .chip[aria-selected='true']:hover { filter: brightness(1.08); }
+  .boton:hover { border-color: var(--acento); box-shadow: 0 2px 6px rgb(35 37 46 / 0.12); }
+  .boton[aria-pressed='true']:hover { filter: brightness(1.08); }
+  .tarjeta a:hover { border-color: var(--c-borde); border-left-color: var(--c-fuerte); background: var(--c-bg); box-shadow: 0 3px 10px rgb(35 37 46 / 0.08); }
+  .limpiar:hover { text-decoration: underline; }
+}
+.chip:focus-visible, .boton:focus-visible, .tarjeta a:focus-visible { outline: 3px solid var(--c-fuerte, var(--acento)); outline-offset: 2px; }
 .chip.grande { font-weight: 600; }
 
 .boton { min-height: 44px; padding: 8px 14px; border-radius: 10px; cursor: pointer; border: 1px solid var(--borde); background: var(--superficie); }
