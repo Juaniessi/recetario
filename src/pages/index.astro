@@ -40,6 +40,9 @@ const textoDe = (r) =>
     <div>
       <div class="grupo-titulo">Tipo de comida</div>
       <div class="chips" id="ramas">
+        <button class="chip grande todas" type="button" id="todas" aria-pressed="true">
+          Todas las recetas <span class="n">{recetas.length}</span>
+        </button>
         {ramas.map((r) => (
           <button class={`chip grande c-${r.color}`} type="button" data-cat={r.id} aria-pressed="false">
             {r.nombre} <span class="n"></span>
@@ -74,7 +77,6 @@ const textoDe = (r) =>
 
   <div class="resumen">
     <span id="cuantas"></span>
-    <button class="limpiar" type="button" id="limpiar" hidden>Ver todas</button>
   </div>
 
   {ramas.map((r) => (
@@ -153,7 +155,7 @@ const textoDe = (r) =>
     document.getElementById('cuantas').textContent = hayAlgo
       ? `${quedan.size} de ${recetas.length} recetas`
       : `${recetas.length} recetas`;
-    document.getElementById('limpiar').hidden = !hayAlgo;
+    document.getElementById('todas').setAttribute('aria-pressed', String(!hayAlgo));
     history.replaceState(null, '', location.pathname + escribirSeleccion(sel));
   }
 
@@ -167,7 +169,7 @@ const textoDe = (r) =>
       else sel.cat = cat;
     } else if (b.dataset.grupo) {
       sel[b.dataset.grupo] = alternar(sel[b.dataset.grupo], b.dataset.valor);
-    } else if (b.id === 'limpiar') {
+    } else if (b.id === 'todas') {
       sel = vacia();
       buscar.value = '';
     } else return;
