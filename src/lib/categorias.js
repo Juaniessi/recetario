@@ -10,6 +10,7 @@ export function leerArbol() {
     nombre: rama.nombre,
     aclaracion: rama.aclaracion ?? '',
     color: rama.color ?? 'indigo',
+    principal: rama.principal === true,
     sub: (rama.sub ?? []).map((s) => ({ id: `${rama.id}/${s.id}`, nombre: s.nombre })),
   }));
 }

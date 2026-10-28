@@ -4,10 +4,13 @@
 # - Las sub-ramas aparecen solas cuando alguna receta las usa.
 # - Una receta las nombra por su id: "helados" o "helados/paletas".
 #   Puede nombrar varias.
+# - principal: true la pone arriba de todo, junto a «Todas las recetas».
+#   Las demás quedan abajo, en «Más categorías».
 # - color: verde, amarillo, naranja, violeta, indigo o celeste.
 # - Para sumar una rama o una sub-rama, se agrega acá y listo.
 
 - id: comidas-principales
+  principal: true
   color: verde
   nombre: Comidas principales
   aclaracion: almuerzo y cena
@@ -36,6 +39,7 @@
       nombre: Waffles
 
 - id: postres-y-pasteleria
+  principal: true
   color: violeta
   nombre: Postres y pastelería
   sub:

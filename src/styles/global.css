@@ -13,12 +13,12 @@
 }
 
 /* Los seis colores. Cada uno: fondo pastel, borde, y uno fuerte para lo elegido. */
-.c-verde    { --c-bg: #e2f5e8; --c-borde: #b5e2c4; --c-fuerte: #3f9d63; --c-texto: #1f5c38; }
-.c-amarillo { --c-bg: #fff4c7; --c-borde: #f3dd85; --c-fuerte: #d9a300; --c-texto: #6b4f00; }
-.c-naranja  { --c-bg: #ffe6d3; --c-borde: #fbc6a0; --c-fuerte: #ec7a30; --c-texto: #7a3a0d; }
-.c-violeta  { --c-bg: #eee4fc; --c-borde: #d3c0f4; --c-fuerte: #8a5ad4; --c-texto: #4b2a85; }
-.c-indigo   { --c-bg: #e3e6fb; --c-borde: #c3c9f2; --c-fuerte: #5361c9; --c-texto: #28327a; }
-.c-celeste  { --c-bg: #dcf1fb; --c-borde: #ade0f4; --c-fuerte: #2f9bd0; --c-texto: #145a7d; }
+.c-verde    { --c-bg: #e2f5e8; --c-borde: #b5e2c4; --c-fuerte: #3f9d63; --c-texto: #1f5c38; --c-halo: rgb(63 157 99 / 0.3); }
+.c-amarillo { --c-bg: #fff4c7; --c-borde: #f3dd85; --c-fuerte: #d9a300; --c-texto: #6b4f00; --c-halo: rgb(217 163 0 / 0.3); }
+.c-naranja  { --c-bg: #ffe6d3; --c-borde: #fbc6a0; --c-fuerte: #ec7a30; --c-texto: #7a3a0d; --c-halo: rgb(236 122 48 / 0.3); }
+.c-violeta  { --c-bg: #eee4fc; --c-borde: #d3c0f4; --c-fuerte: #8a5ad4; --c-texto: #4b2a85; --c-halo: rgb(138 90 212 / 0.3); }
+.c-indigo   { --c-bg: #e3e6fb; --c-borde: #c3c9f2; --c-fuerte: #5361c9; --c-texto: #28327a; --c-halo: rgb(83 97 201 / 0.3); }
+.c-celeste  { --c-bg: #dcf1fb; --c-borde: #ade0f4; --c-fuerte: #2f9bd0; --c-texto: #145a7d; --c-halo: rgb(47 155 208 / 0.3); }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -54,19 +54,29 @@ button, input, select { font: inherit; color: inherit; }
   color: var(--c-texto, var(--texto));
   display: inline-flex; align-items: center; gap: 6px;
 }
-/* El número: un globito aparte, que se lee de un vistazo. */
+/* El número: un globito aparte, que se lee de un vistazo.
+   text-box recorta el aire de arriba y de abajo de la letra, así el número queda
+   centrado de verdad y no según el renglón (donde los dígitos quedan altos). */
 .chip .n {
-  min-width: 1.7em; height: 1.7em; padding: 0 0.45em; margin-left: 2px;
-  border-radius: 0.85em; display: inline-flex; align-items: center; justify-content: center;
-  font-size: 0.85rem; font-weight: 700; line-height: 1;
+  display: inline-block; min-width: 1.85em; padding: 0.55em 0.45em; margin-left: 2px;
+  border-radius: 999px; text-align: center;
+  font-size: 0.85rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums;
+  text-box: trim-both cap alphabetic;
   background: var(--c-fuerte, var(--acento)); color: #fff;
 }
 .chip[aria-pressed='true'] .n { background: #fff; color: var(--c-fuerte, var(--acento)); }
 .chip:disabled .n { background: var(--suave); }
 .chip.todas { font-weight: 600; }
-@media (max-width: 500px) { .chip { font-size: 16px; padding: 8px 12px; } }
+/* Las tres de arriba: más grandes. */
+.chip.principal { font-size: 1.1rem; font-weight: 700; padding: 10px 18px; min-height: 52px; border-radius: 26px; }
+@media (max-width: 500px) {
+  .chip { font-size: 16px; padding: 8px 12px; }
+  .chip.principal { font-size: 17px; padding: 10px 14px; }
+}
+/* Lo elegido: relleno fuerte y un halo de su color alrededor. */
 .chip[aria-pressed='true'], .chip[aria-selected='true'] {
   background: var(--c-fuerte, var(--acento)); border-color: var(--c-fuerte, var(--acento)); color: #fff;
+  box-shadow: 0 0 0 4px var(--c-halo, rgb(75 86 184 / 0.28)), 0 0 14px 2px var(--c-halo, rgb(75 86 184 / 0.28));
 }
 .chip:disabled { opacity: 0.35; cursor: default; }
 
@@ -78,7 +88,7 @@ button, input, select { font: inherit; color: inherit; }
     box-shadow: 0 2px 6px rgb(35 37 46 / 0.12);
     transform: translateY(-1px);
   }
-  .chip[aria-pressed='true']:hover, .chip[aria-selected='true']:hover { filter: brightness(1.08); }
+  .chip[aria-pressed='true']:hover, .chip[aria-selected='true']:hover { filter: brightness(1.08); transform: translateY(-1px); }
   .boton:hover { border-color: var(--acento); box-shadow: 0 2px 6px rgb(35 37 46 / 0.12); }
   .boton[aria-pressed='true']:hover { filter: brightness(1.08); }
   .tarjeta a:hover { border-color: var(--c-borde); border-left-color: var(--c-fuerte); background: var(--c-bg); box-shadow: 0 3px 10px rgb(35 37 46 / 0.08); }
@@ -94,6 +104,8 @@ button, input, select { font: inherit; color: inherit; }
 .filtros { display: grid; gap: 12px; }
 .filtros > * { min-width: 0; }
 .grupo-titulo { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--suave); margin: 4px 0; }
+.principales { gap: 10px; padding: 4px 0; }
+.grupo-titulo.filtrar { font-size: 0.85rem; font-weight: 700; color: var(--texto); border-top: 1px solid var(--borde); padding-top: 14px; margin-top: 6px; }
 .sub-ramas { padding: 8px 0 8px 12px; border-left: 4px solid var(--c-fuerte); }
 .resumen { color: var(--suave); margin: 20px 0 8px; font-size: 0.95rem; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .vacia { background: var(--superficie); border: 1px dashed var(--borde); border-radius: 12px; padding: 16px; color: var(--suave); }

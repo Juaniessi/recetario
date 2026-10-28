@@ -12,6 +12,9 @@ const recetas = (await getCollection('recetas')).sort((a, b) => a.data.titulo.lo
 // Las sub-ramas se muestran solo si alguna receta las usa.
 const usadas = new Set(recetas.flatMap((r) => r.data.categorias));
 const ramas = arbol.map((r) => ({ ...r, sub: r.sub.filter((s) => usadas.has(s.id)) }));
+// Arriba, junto a «Todas las recetas», las principales; el resto, para filtrar.
+const principales = ramas.filter((r) => r.principal);
+const otras = ramas.filter((r) => !r.principal);
 
 const ingredientes = [...new Set(recetas.flatMap((r) => r.data.ingrediente_principal))].sort((a, b) => a.localeCompare(b, 'es'));
 
@@ -37,21 +40,38 @@ const textoDe = (r) =>
   <input class="buscar" id="buscar" type="search" placeholder="Buscar: chocolate, paleta, harina…" autocomplete="off" />
 
   <div class="filtros">
-    <div>
-      <div class="grupo-titulo">Tipo de comida</div>
-      <div class="chips" id="ramas">
-        <button class="chip grande todas" type="button" id="todas" aria-pressed="true">
-          Todas las recetas <span class="n">{recetas.length}</span>
+    <div class="chips principales">
+      <button class="chip principal todas" type="button" id="todas" aria-pressed="true">
+        Todas las recetas <span class="n">{recetas.length}</span>
+      </button>
+      {principales.map((r) => (
+        <button class={`chip principal c-${r.color}`} type="button" data-cat={r.id} aria-pressed="false">
+          {r.nombre} <span class="n"></span>
         </button>
-        {ramas.map((r) => (
+      ))}
+    </div>
+    {principales.filter((r) => r.sub.length).map((r) => (
+      <div class={`sub-ramas chips c-${r.color}`} data-padre={r.id} hidden>
+        {r.sub.map((s) => (
+          <button class="chip" type="button" data-cat={s.id} aria-pressed="false">
+            {s.nombre} <span class="n"></span>
+          </button>
+        ))}
+      </div>
+    ))}
+
+    <div class="grupo-titulo filtrar">Filtrar por</div>
+    <div>
+      <div class="grupo-titulo">Más categorías</div>
+      <div class="chips">
+        {otras.map((r) => (
           <button class={`chip grande c-${r.color}`} type="button" data-cat={r.id} aria-pressed="false">
             {r.nombre} <span class="n"></span>
           </button>
         ))}
       </div>
     </div>
-
-    {ramas.filter((r) => r.sub.length).map((r) => (
+    {otras.filter((r) => r.sub.length).map((r) => (
       <div class={`sub-ramas chips c-${r.color}`} data-padre={r.id} hidden>
         {r.sub.map((s) => (
           <button class="chip" type="button" data-cat={s.id} aria-pressed="false">
