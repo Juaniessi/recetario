@@ -6,6 +6,8 @@ Sitio propio de recetas de Juan, para usar en la cocina desde el celular.
 - Sitio: https://juaniessi.github.io/recetario/ (público, sin indexar: `noindex` y `robots.txt`)
 - Repo: `Juaniessi/recetario`
 - Agregar o corregir recetas: ver `COMO-AGREGAR-RECETA.md`.
+- Publicado el 28/10/2026. Cada push a `main` publica en menos de un minuto; si
+  la Action falla (receta mal escrita), el sitio queda como estaba.
 
 ## Cómo está hecho
 
