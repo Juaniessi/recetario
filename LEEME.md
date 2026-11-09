@@ -8,6 +8,9 @@ Sitio propio de recetas de Juan, para usar en la cocina desde el celular.
 - Agregar o corregir recetas: ver `COMO-AGREGAR-RECETA.md`.
 - Publicado el 28/10/2026. Cada push a `main` publica en menos de un minuto; si
   la Action falla (receta mal escrita), el sitio queda como estaba.
+- **Para subir cambios: doble click en `subir-recetas.bat`** (ver más abajo).
+  Claude nunca hace git commit ni push: si Juan lo pide, lanza el .bat en la
+  terminal de Juan, que responde y autoriza. Guía para Claude: `CLAUDE.md`.
 
 ## Cómo está hecho
 
@@ -25,6 +28,26 @@ No hay backend ni base de datos: el escalado y los filtros corren en el navegado
 | `src/lib/receta.js` | Reemplaza `{id}` en los pasos por la cantidad escalable; un `{id}` inexistente corta la compilación |
 | `src/pages/index.astro` | Inicio: árbol, botones transversales, buscador, tarjetas |
 | `src/pages/[id].astro` | Página de receta: escalado, ingredientes con tilde, pantalla encendida |
+
+## Subir cambios: `subir-recetas.bat` (desde el 28/10/2026)
+
+Doble click. La lógica está en `scripts/subir.mjs`:
+
+1. Muestra qué archivos cambiaron.
+2. Corre las pruebas y compila. Si una receta tiene un error, dice cuál y en qué
+   campo, y no sube nada.
+3. Pregunta si subir y pide una línea que describa el cambio (opcional).
+4. Hace el commit y el push. **Se abre la ventana de GitHub: «Sign in with your
+   browser» y autorizar.** Nunca usuario y contraseña en la terminal.
+5. **Borra la autorización de esta PC apenas termina**, haya salido bien o mal.
+   Así nada (ni Claude) puede subir sin que Juan vuelva a autorizar.
+6. Espera a que GitHub publique y avisa si salió bien.
+
+Si el push falla (por ejemplo, se cerró la ventana), el cambio queda guardado en
+la PC y la próxima vez que se abre el script lo sube.
+
+`subir-recetas.bat --prueba` (o `node scripts/subir.mjs --prueba`) hace los
+pasos 1 y 2 y no sube nada: es lo que corre Claude para verificar.
 
 ## Correrlo en la PC
 

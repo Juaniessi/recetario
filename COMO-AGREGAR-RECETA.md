@@ -6,7 +6,9 @@ archivo; corregirla es editarlo. No hay que tocar código.
 ## La vía corta: pedírselo a Claude
 
 Pasale la receta o el chat y pedile que la cargue en el recetario. Claude escribe
-el archivo, compila para ver que no tenga errores y la sube.
+el archivo y compila para ver que no tenga errores. **No la sube**: cuando estés
+conforme, doble click en `subir-recetas.bat` (en la carpeta del recetario). El
+script revisa todo de nuevo, te pide autorizar en la ventana de GitHub y publica.
 
 ## A mano, desde la web de GitHub (sirve desde el celular)
 

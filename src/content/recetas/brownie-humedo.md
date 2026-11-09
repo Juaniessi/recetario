@@ -19,7 +19,7 @@ molde:
 datos:
   - Horno: 170 °C convencional, sin ventilador (160 °C si el molde es de vidrio o de chapa oscura)
   - Temperatura objetivo: 85–88 °C en el centro, con termómetro de pinche
-  - Tiempo real en mi horno: 35–36 minutos en molde de 30 × 30 (prueba del 25/10/2026)
+  - Tiempo real en mi horno: 35–36 minutos en molde de 30 × 30 (prueba del 25/10/2026) y 35 minutos en 25 × 25 (07/11/2026)
   - Reposo: unas 3 horas en el molde antes de cortar
 ingredientes:
   - lista:
@@ -88,6 +88,7 @@ ingredientes:
 
 - **25/10/2026 — molde de 30 × 30, con chocolate Tronador 54 %.** Esa tanda iba con 384 g de huevo (7 chicos), 437 g de chocolate y 481 g de azúcar: con el 54 % el azúcar se bajó para compensar. Salió bien. Tardó 35–36 minutos; abrí la puerta a los 27 y a los 37 minutos, así que con el horno cerrado probablemente sean uno o dos minutos menos. A los 27 minutos el centro estaba líquido y marcaba unos 60 °C; que después llegara a 88 °C en unos 9 minutos hace sospechar que esa lectura estuvo mal (por ejemplo, con la punta del termómetro tocando el fondo). La superficie quedó con burbujitas.
 - **28/10/2026 — se pasó a la base de 20 × 20 con chocolate 70 %.** Sin probar todavía con este chocolate.
+- **07/11/2026 — molde de 25 × 25 (×1,56).** Tardó 35 minutos en total. A los 32 minutos arriba estaba muy crudo y el centro marcaba 83 °C; en los últimos 3 minutos subí el horno a 200 °C y salió con 86 °C en el centro. El palillo salió con bastante masa pegada, pero al tacto se sentía firme. Resultado: pendiente (cuando se enfríe y lo pruebe).
 
 ## Pendiente
 

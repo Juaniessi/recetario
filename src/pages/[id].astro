@@ -25,6 +25,7 @@ const pesables = todos
   .filter((i) => i.cantidad !== undefined && i.escala)
   .map((i) => ({ nombre: i.nombre, base: Array.isArray(i.cantidad) ? i.cantidad[0] : i.cantidad, unidad: i.unidad }));
 const huevo = todos.find((i) => i.unidad_natural && !Array.isArray(i.cantidad));
+const huevosBase = huevo && unidades(huevo.cantidad, huevo.unidad_natural.gramos);
 const masa = masaTotal(r.ingredientes);
 const moldeTexto =
   r.molde && (r.molde.forma === 'redondo' ? `redondo de ${numero(r.molde.diametro)} cm` : `${numero(r.molde.ancho)} × ${numero(r.molde.largo)} cm`);
@@ -115,7 +116,7 @@ const aclaracionMasa = [masa.hayMl && 'los ml se cuentan como g', 'sin opcionale
         {huevo && (
           <div class="modo" data-panel="huevos" hidden data-base={huevo.cantidad}>
             <p class="ayuda">
-              La receta pide {numero(huevo.cantidad)} g de huevo, unos {unidades(huevo.cantidad, huevo.unidad_natural.gramos)} {huevo.unidad_natural.plural}. Elegí cuántos enteros vas a usar y no sobra medio huevo.
+              La receta pide {numero(huevo.cantidad)} g de huevo, {huevosBase === '1' ? `1 ${huevo.unidad_natural.nombre}` : `unos ${huevosBase} ${huevo.unidad_natural.plural}`}. Elegí cuántos enteros vas a usar y no sobra medio huevo.
             </p>
             <div class="fila">
               <span>Tengo</span>
