@@ -51,7 +51,7 @@ async function esperarPublicacion(sha) {
   // La Action del repo es pública: se puede consultar sin autorización.
   const url = `https://api.github.com/repos/${REPO}/actions/runs?head_sha=${sha}&per_page=1`;
   const hasta = Date.now() + 5 * 60_000;
-  process.stdout.write('Esperando a GitHub');
+  process.stdout.write('Esperando a GitHub (suele tardar 1 o 2 minutos; un punto cada 10 segundos)');
   while (Date.now() < hasta) {
     await new Promise((r) => setTimeout(r, 10_000));
     process.stdout.write('.');
