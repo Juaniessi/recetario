@@ -126,6 +126,8 @@ dos versiones.
 - **Gramos y mililitros siempre**, también el huevo (`unidad_natural`, 50 g = 1).
 - **Las cantidades dentro de los pasos van como `{id}`**, nunca un número fijo.
   `{rinde}` da lo que rinde. Un `{id}` que no existe corta la compilación.
+  Los `id` van solo con minúsculas, números y guiones: `agua-gelatina`, no
+  `agua_gelatina`.
 - Para que se pueda escalar por molde o fuente, la receta lleva `molde`
   (`forma: rectangular` con `ancho` y `largo`, o `forma: redondo` con
   `diametro`, en cm).
