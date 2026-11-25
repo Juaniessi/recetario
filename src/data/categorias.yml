@@ -49,6 +49,8 @@
       nombre: Tortas, budines y brownies
     - id: chocolate
       nombre: Chocolate
+    - id: postres-frios
+      nombre: Postres fríos
 
 - id: helados
   color: celeste

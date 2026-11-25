@@ -2,7 +2,7 @@
 titulo: Bavarois de frutilla (Bavarich)
 estado: en-prueba
 categorias:
-  - postres-y-pasteleria
+  - postres-y-pasteleria/postres-frios
 sabor: dulce
 equipo: [cacerola]
 ingrediente_principal: [frutilla, crema]
