@@ -1,5 +1,6 @@
 // Sube al sitio los cambios del recetario. Lo abre subir-recetas.bat.
 //
+// 0. Si se subió algo desde otra PC o desde la web de GitHub, lo trae primero.
 // 1. Muestra qué archivos cambiaron.
 // 2. Corre las pruebas y compila: si una receta tiene un error, frena acá.
 // 3. Pide confirmación, hace el commit y el push.
@@ -71,9 +72,33 @@ async function esperarPublicacion(sha) {
   return `GitHub sigue publicando. Mirá cómo va en https://github.com/${REPO}/actions`;
 }
 
+// En una PC nueva git no sabe a nombre de quién guardar el cambio, y el commit falla.
+if (!git('config', 'user.email').salida.trim()) {
+  salir(
+    'Falta decirle a git quién sos (se hace una sola vez en cada PC). Escribí en esta terminal:\n' +
+      '  git config --global user.name "Juan"\n' +
+      '  git config --global user.email "el-mail-de-tu-cuenta-de-github"\n' +
+      'y volvé a abrir el script.',
+  );
+}
+
+// Si se subió algo desde otra PC (o desde la web de GitHub), primero se trae.
+// El repo es público: traer no pide autorización.
+git('fetch', '--quiet', 'origin');
+if (Number(git('rev-list', '--count', 'HEAD..origin/main').salida.trim()) > 0) {
+  titulo('Trayendo lo que se subió desde otro lado');
+  const traer = git('pull', '--rebase', '--autostash', '--quiet', 'origin', 'main');
+  if (!traer.ok) {
+    salir(
+      `No se pudo traer lo de GitHub: la misma receta cambió acá y allá.\n${traer.salida}\n` +
+        'No se subió nada. Pedile a Claude que lo resuelva.',
+    );
+  }
+  console.log('Listo: esta PC ya tiene lo último del sitio.');
+}
+
 titulo('Qué cambió');
 const cambios = git('status', '--short', '--untracked-files=all').salida.split('\n').filter(Boolean);
-git('fetch', '--quiet', 'origin');
 const sinSubir = git('rev-list', '--count', 'origin/main..HEAD').salida.trim();
 const pendientes = Number(sinSubir) || 0;
 

@@ -62,9 +62,9 @@ ingredientes:
         unidad: g
       - id: sal
         nombre: Sal fina
-        cantidad: 5
+        cantidad: 4
         unidad: g
-        nota: la original pide 1 cucharadita (unos 6 g de sal fina)
+        nota: va batida con los huevos y el azúcar, para que se disuelva; la original pide 1 cucharadita (unos 6 g de sal fina)
       - id: trozos
         nombre: Chocolate picado grueso o chips
         cantidad: 75
@@ -78,23 +78,24 @@ ingredientes:
 3. Dorá {manteca} de manteca en una cacerola a fuego medio, moviendo seguido, hasta que deje de hacer espuma, huela a avellana y el fondo tenga puntitos marrones. Sacala del fuego enseguida: de dorada a quemada hay segundos.
 4. Dejala un minuto y volcala sobre el chocolate, raspando los puntitos del fondo, que son el sabor. Dejalo reposar sin tocar para que el chocolate se derrita y después mezclá.
 5. Tamizá {cacao} de cacao sobre el chocolate derretido y mezclá. Dejalo templar hasta que esté tibio.
-6. Batí {huevo} de huevo con {rubia} de azúcar rubia, {blanca} de azúcar blanca y {vainilla} de vainilla a velocidad alta, hasta que estén pálidos, espesos y hagan cinta. **De acá sale la costra brillante.**
+6. Batí {huevo} de huevo con {rubia} de azúcar rubia, {blanca} de azúcar blanca, {sal} de sal y {vainilla} de vainilla a velocidad alta, hasta que estén pálidos, espesos y hagan cinta. **De acá sale la costra brillante.**
 7. Sin dejar de batir, sumá la mezcla de chocolate en hilo.
-8. Sumá {harina} de harina tamizada, {sal} de sal y {trozos} de chocolate en trozos, y uní con espátula, con movimientos envolventes y lo justo.
+8. Sumá {harina} de harina tamizada y {trozos} de chocolate en trozos, y uní con espátula, con movimientos envolventes y lo justo.
 9. Volcá en el molde, emparejá y horneá hasta que el centro marque **85–88 °C**. La original dice 28 a 35 minutos.
 10. Dejalo enfriar en el molde antes de cortar en {rinde}.
 
 ## Notas
 
 - **Comparada con el brownie húmedo** (mismo molde): más manteca (+46 %), más azúcar (+20 %), más chocolate y cacao, menos huevo (−14 %) y menos harina (−25 %). Tiene que salir más denso, más húmedo y más dulce, y con gusto a manteca tostada. Da unos 1.020 g de masa contra 920 (la «Masa total» del sitio dice 1.065 porque cuenta la manteca antes de dorarla), así que sale un poco más alto.
+- **La sal va con los huevos, no con la harina.** La harina se une con espátula y lo justo, así que lo que entra con ella no se reparte parejo: en la primera prueba había partes más saladas que otras. Batida con los huevos y el azúcar, la sal se disuelve toda.
 - **Que no se corte:** con tanta grasa y menos huevo, si la mezcla de chocolate está caliente cuando va a los huevos, puede quedar aceitoso. Tiene que estar tibia.
 
 ## Cambios respecto de la original
 
 - **Chocolate Tronador 71 %** en vez de semiamargo. Queda menos dulce que el original, más parecido al nuestro.
-- **Sal 5 g** en vez de 1 cucharadita: según la sal que usaba la autora, eso son entre 3 y 6 g.
+- **Sal 4 g** en vez de 1 cucharadita (entre 3 y 6 g, según la sal que usaba la autora), y batida con los huevos en vez de sumada con la harina. La primera prueba fue con 5 g con la harina, y en algunas partes se sentía más la sal.
 - Las tazas, cucharaditas y «3 huevos grandes» se pasaron a gramos; los gramos son los de la original.
 
 ## Registro de pruebas
 
-- Todavía no la hice.
+- **Noviembre de 2026 — molde de 20 × 20, con 5 g de sal.** Salió mucho mejor que el brownie húmedo: pasa a ser el brownie de la casa. En algunas partes se sentía más la sal que en otras, aunque se mezcló con batidora (la sal iba con la harina). Para la próxima: 4 g de sal, batida con los huevos y el azúcar.

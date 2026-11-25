@@ -46,6 +46,10 @@ Doble click. La lógica está en `scripts/subir.mjs`:
 Si el push falla (por ejemplo, se cerró la ventana), el cambio queda guardado en
 la PC y la próxima vez que se abre el script lo sube.
 
+Desde el 25/11/2026, antes de empezar, el script **trae lo que se haya subido
+desde otra PC o desde la web de GitHub**. Si en esa PC falta configurar el
+nombre y el mail de git, frena y avisa.
+
 `subir-recetas.bat --prueba` (o `node scripts/subir.mjs --prueba`) hace los
 pasos 1 y 2 y no sube nada: es lo que corre Claude para verificar.
 
@@ -59,7 +63,11 @@ npm run preview   # http://localhost:4321/recetario/
 ```
 
 En el navegador de la app de Claude: `preview_start` con el nombre `recetario`
-(está en `C:\Proyectos Claude\.claude\launch.json`).
+(está en `.claude/launch.json` de este repo).
+
+Para armar otra PC (la de casa, por ejemplo): ver «Preparar otra PC» en
+`CLAUDE.md`. Hace falta Git para Windows, Node 22.23 o más, `git clone`,
+`npm ci` y decirle a git el nombre y el mail una vez.
 
 ## Decisiones (28/10/2026)
 
@@ -89,11 +97,32 @@ En el navegador de la app de Claude: `preview_start` con el nombre `recetario`
   Astro 7 trae un motor de Markdown propio (Sätteri) con otra API de plugins;
   por eso los `{id}` se reemplazan sobre el HTML ya armado y no con un plugin.
 
+## Cambios del 25/11/2026
+
+- **El brownie de manteca dorada pasa a ser el de la casa**: a Juan le gustó
+  más que el brownie húmedo. La sal baja a 4 g y se bate con los huevos, porque
+  sumada con la harina no se repartía pareja.
+- La pestaña de escalar por molde ahora se llama «Molde o fuente».
+- **Todo lo necesario para trabajar desde otra PC quedó en el repo**:
+  - `CLAUDE.md`: el flujo, el formato, cómo subir y cómo preparar otra PC;
+  - `.claude/launch.json`;
+  - el script, que ahora trae lo de la otra PC antes de subir.
+
+## Pendientes
+
+- Brownie de manteca dorada: probar la sal a 4 g batida con los huevos, y
+  anotar el tiempo real de horno y el día (la primera prueba no los registró).
+- Brownie húmedo en 25 × 25 (07/11/2026): falta el resultado de gusto (costra,
+  humedad, dulzor).
+- Pollo «Gourmet de Shanghai» (https://www.instagram.com/reel/DfvA6RLBRJq/): el
+  video no da cantidades. Se carga si Juan las averigua. Falta decidir si es una
+  variante del pollo agridulce o una receta aparte.
+- Tortas fritas: confirmar el título.
+- Recetas de otros chats que faltan: yogur, frozen yogurt, puchero, ajo negro.
+
 ## Segunda tanda (pendiente, a pedido)
 
 Timers por paso · hidratación calculada en panes · registro de pruebas con
 formato (fecha, resultado, tiempo real) · páginas «Mi cocina» (horno, despensa,
 equipamiento) y «Aprendizajes técnicos» · ícono para la pantalla de inicio del
 celular.
-
-Recetas que faltan, de otros chats: yogur, frozen yogurt, puchero, ajo negro.
